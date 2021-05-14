@@ -94,24 +94,48 @@ class Bishop extends React.Component {
     //down the ranks up the files
     //up the ranks up the files
     //down the ranks down the files
-    
-    for(let i = 0; i < ranks.length; i++) {
-      traverseFiles = (traverseFiles+1) % files.length;
-      traverseRanks = (traverseRanks+1) % ranks.length;
+    let i = 0;
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles+1;
+      traverseRanks = traverseRanks+1;
       pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
+      i++;
+    }
+
+    traverseFiles = indexOfFile;
+    traverseRanks = indexOfRank;
+
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles+1;
+      traverseRanks = traverseRanks+1;
+      pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
+      i++;
     }
 
     potentialMoves[0] = pathOne;
 
-    for(i = 0; i < files.length; i++) {
-      traverseFiles = (traverseFiles-1) % files.length;
-      traverseRanks = (traverseRanks+1) % ranks.length;
+    traverseFiles = indexOfFile;
+    traverseRanks = indexOfRank;
+
+    i = 0;
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles+1;
+      traverseRanks = traverseRanks-1;
+      pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
+      i++;
+    }
+
+    traverseFiles = indexOfFile;
+    traverseRanks = indexOfRank;
+
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles-1;
+      traverseRanks = traverseRanks+1;
       pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
     }
 
     potentialMoves[1] = pathTwo;
-
-    //potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
+    
     return potentialMoves;
   }
 
@@ -148,9 +172,10 @@ class Rook extends React.Component {
     let pathOne = [];
     let pathTwo = [];
 
+    
     for(let i = 0; i < files.length; i++) {
       traverseFiles = (traverseFiles + 1) % files.length;
-      pathOne[i] = files[traverseFiles] + rank;
+      pathOne[i] = file + ranks[traverseFiles];
     }
 
     potentialMoves[0] = pathOne;
@@ -162,9 +187,7 @@ class Rook extends React.Component {
 
     potentialMoves[1] = pathTwo;
 
-    //potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
     return potentialMoves;
-
   }
 
   handleClick(){
@@ -183,6 +206,10 @@ class Rook extends React.Component {
 }
 
 class Queen extends React.Component {
+
+  calculateLegalMoves(coordinate) {
+
+  }
   calculatePotentialMoves(coordinate) {
     const file = coordinate.substring(0, 1);
     const rank = coordinate.substring(1);
@@ -199,18 +226,43 @@ class Queen extends React.Component {
     let pathThree = [];
     let pathFour = [];
     
-    for(let i = 0; i < ranks.length; i++) {
-      traverseFiles = (traverseFiles+1) % files.length;
-      traverseRanks = (traverseRanks+1) % ranks.length;
+    let i = 0;
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles+1;
+      traverseRanks = traverseRanks+1;
       pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
+      i++;
+    }
+
+    traverseFiles = indexOfFile;
+    traverseRanks = indexOfRank;
+
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles+1;
+      traverseRanks = traverseRanks+1;
+      pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
+      i++;
     }
 
     potentialMoves[0] = pathOne;
-    
 
-    for(i = 0; i < files.length; i++) {
-      traverseFiles = (traverseFiles-1) % files.length;
-      traverseRanks = (traverseRanks+1) % ranks.length;
+    traverseFiles = indexOfFile;
+    traverseRanks = indexOfRank;
+
+    i = 0;
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles+1;
+      traverseRanks = traverseRanks-1;
+      pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
+      i++;
+    }
+
+    traverseFiles = indexOfFile;
+    traverseRanks = indexOfRank;
+
+    while(files[traverseFiles] || files[traverseRanks]) {
+      traverseFiles = traverseFiles-1;
+      traverseRanks = traverseRanks+1;
       pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
     }
 

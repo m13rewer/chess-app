@@ -1,369 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import React from 'react';
-
-class Pawn extends React.Component {
-
-  calculatePotentialMoves(coordinate) {
-    const file = coordinate.substring(0, 1);
-    const rank = coordinate.substring(1);
-    let potentialMoves = [];
-    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    const indexOfFile = files.indexOf(file);
-    const indexOfRank = ranks.indexOf(rank);
-
-    potentialMoves[0] = files[indexOfFile+1] + rank;
-    potentialMoves[1] = files[indexOfFile-1] + rank;
-    potentialMoves[2] = file + ranks[indexOfRank+1];
-    potentialMoves[3] = file + ranks[indexOfRank+2];
-    potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
-    
-    return potentialMoves;
-  }
-
-  handleClick(){
-    const potentialMoves = this.calculatePotentialMoves(this.props.coordinate);
-    this.props.onClick(this.props.coordinate, 
-      {
-        piece: 'P', color: this.props.color, potentialMoves: potentialMoves
-      });
-  }
-
-  render() {
-    return (
-      <p onClick={()=>this.handleClick()}>P</p>
-    );
-  }
-}
-
-class Knight extends React.Component {
-  calculatePotentialMoves(coordinate) {
-    const file = coordinate.substring(0, 1);
-    const rank = coordinate.substring(1);
-    let potentialMoves = [];
-    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    const indexOfFile = files.indexOf(file);
-    const indexOfRank = ranks.indexOf(rank);
-
-    potentialMoves[0] = files[indexOfFile+1] + ranks[indexOfRank+2];
-    potentialMoves[1] = files[indexOfFile+1] + ranks[indexOfRank-2];
-    potentialMoves[2] = files[indexOfFile-1] + ranks[indexOfRank+2];
-    potentialMoves[3] = files[indexOfFile-1] + ranks[indexOfRank-2];
-    potentialMoves[4] = files[indexOfFile+2] + ranks[indexOfRank+1];
-    potentialMoves[5] = files[indexOfFile+2] + ranks[indexOfRank-1];
-    potentialMoves[6] = files[indexOfFile-2] + ranks[indexOfRank+1];
-    potentialMoves[7] = files[indexOfFile-2] + ranks[indexOfRank-1];
-
-    potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
-    return potentialMoves;
-  }
-
-  handleClick(){
-    const potentialMoves = this.calculatePotentialMoves(this.props.coordinate);
-    this.props.onClick(this.props.coordinate, 
-      {
-        piece: 'N', color: this.props.color, potentialMoves: potentialMoves
-      });
-  }
-
-  render() {
-    return (
-      <p onClick={()=>this.handleClick()}>N</p>
-    );
-  }
-}
-
-class Bishop extends React.Component {
-  calculatePotentialMoves(coordinate) {
-    const file = coordinate.substring(0, 1);
-    const rank = coordinate.substring(1);
-    let potentialMoves = [];
-    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    const indexOfFile = files.indexOf(file);
-    const indexOfRank = ranks.indexOf(rank);
-
-    let traverseFiles = indexOfFile;
-    let traverseRanks = indexOfRank;
-    let pathOne = [];
-    let pathTwo = [];
-    
-    //up the ranks down the files
-    //down the ranks up the files
-    //up the ranks up the files
-    //down the ranks down the files
-    let i = 0;
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles+1;
-      traverseRanks = traverseRanks+1;
-      pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
-      i++;
-    }
-
-    traverseFiles = indexOfFile;
-    traverseRanks = indexOfRank;
-
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles+1;
-      traverseRanks = traverseRanks+1;
-      pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
-      i++;
-    }
-
-    potentialMoves[0] = pathOne;
-
-    traverseFiles = indexOfFile;
-    traverseRanks = indexOfRank;
-
-    i = 0;
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles+1;
-      traverseRanks = traverseRanks-1;
-      pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
-      i++;
-    }
-
-    traverseFiles = indexOfFile;
-    traverseRanks = indexOfRank;
-
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles-1;
-      traverseRanks = traverseRanks+1;
-      pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
-    }
-
-    potentialMoves[1] = pathTwo;
-    
-    return potentialMoves;
-  }
-
-  handleClick(){
-    const potentialMoves = this.calculatePotentialMoves(this.props.coordinate);
-    this.props.onClick(this.props.coordinate, 
-      {
-        piece: 'B', color: this.props.color, potentialMoves: potentialMoves
-      });
-  }
-
-  render() {
-    return (
-      <p onClick={()=>this.handleClick()}>B</p>
-    );
-  }
-}
-
-class Rook extends React.Component {
-  calculatePotentialMoves(coordinate) {
-    const file = coordinate.substring(0, 1);
-    const rank = coordinate.substring(1);
-    let potentialMoves = [];
-    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    const indexOfFile = files.indexOf(file);
-    const indexOfRank = ranks.indexOf(rank);
-
-
-    //up down ranks same file
-    //up down files same rank
-    let traverseFiles = indexOfFile;
-    let traverseRanks = indexOfRank;
-    let pathOne = [];
-    let pathTwo = [];
-
-    
-    for(let i = 0; i < files.length; i++) {
-      traverseFiles = (traverseFiles + 1) % files.length;
-      pathOne[i] = file + ranks[traverseFiles];
-    }
-
-    potentialMoves[0] = pathOne;
-
-    for(i = 0; i < ranks.length; i++) {
-      traverseRanks = (traverseRanks + 1) % ranks.length;
-      pathTwo[i] = file + ranks[traverseRanks];
-    }
-
-    potentialMoves[1] = pathTwo;
-
-    return potentialMoves;
-  }
-
-  handleClick(){
-    const potentialMoves = this.calculatePotentialMoves(this.props.coordinate);
-    this.props.onClick(this.props.coordinate, 
-      {
-        piece: 'R', color: this.props.color, potentialMoves: potentialMoves
-      });
-  }
-
-  render() {
-    return (
-      <p onClick={()=>this.handleClick()}>R</p>
-    );
-  }
-}
-
-class Queen extends React.Component {
-
-  calculateLegalMoves(coordinate) {
-
-  }
-  calculatePotentialMoves(coordinate) {
-    const file = coordinate.substring(0, 1);
-    const rank = coordinate.substring(1);
-    let potentialMoves = [];
-    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    const indexOfFile = files.indexOf(file);
-    const indexOfRank = ranks.indexOf(rank);
-
-    let traverseFiles = indexOfFile;
-    let traverseRanks = indexOfRank;
-    let pathOne = [];
-    let pathTwo = [];
-    let pathThree = [];
-    let pathFour = [];
-    
-    let i = 0;
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles+1;
-      traverseRanks = traverseRanks+1;
-      pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
-      i++;
-    }
-
-    traverseFiles = indexOfFile;
-    traverseRanks = indexOfRank;
-
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles+1;
-      traverseRanks = traverseRanks+1;
-      pathOne[i] = files[traverseFiles] + ranks[traverseRanks];
-      i++;
-    }
-
-    potentialMoves[0] = pathOne;
-
-    traverseFiles = indexOfFile;
-    traverseRanks = indexOfRank;
-
-    i = 0;
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles+1;
-      traverseRanks = traverseRanks-1;
-      pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
-      i++;
-    }
-
-    traverseFiles = indexOfFile;
-    traverseRanks = indexOfRank;
-
-    while(files[traverseFiles] || files[traverseRanks]) {
-      traverseFiles = traverseFiles-1;
-      traverseRanks = traverseRanks+1;
-      pathTwo[i] = files[traverseFiles] + ranks[traverseRanks];
-    }
-
-    potentialMoves[1] = pathTwo;
-
-    for(i = 0; i < files.length; i++) {
-      traverseFiles = (traverseFiles + 1) % files.length;
-      pathThree[i] = files[traverseFiles] + rank;
-    }
-
-    potentialMoves[2] = pathThree;
-
-    for(i = 0; i < ranks.length; i++) {
-      traverseRanks = (traverseRanks + 1) % ranks.length;
-      pathFour[i] = file + ranks[traverseRanks];
-    }
-
-    potentialMoves[3] = pathFour;
-
-
-    //up the ranks down the files
-    //down the ranks up the files
-    //up the ranks up the files
-    //down the ranks down the files
-    //up down ranks same file
-    //up down files same rank
-    //potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
-    return potentialMoves;
-  }
-
-  handleClick(){
-    const potentialMoves = this.calculatePotentialMoves(this.props.coordinate);
-    this.props.onClick(this.props.coordinate, 
-      {
-        piece: 'Q', color: this.props.color, potentialMoves: potentialMoves
-      });
-  }
-
-  render() {
-    return (
-      <p onClick={()=>this.handleClick()}>Q</p>
-    );
-  }
-}
-
-class King extends React.Component {
-  calculatePotentialMoves(coordinate) {
-    const file = coordinate.substring(0, 1);
-    const rank = coordinate.substring(1);
-    
-    let potentialMoves = [];
-    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
-    const indexOfFile = files.indexOf(file);
-    const indexOfRank = ranks.indexOf(rank);
-    potentialMoves[0] = file+ranks[indexOfRank+1];
-    potentialMoves[1] = file+ranks[indexOfRank-1];
-    potentialMoves[2] = files[indexOfFile+1]+ranks[indexOfRank+1];
-    potentialMoves[3] = files[indexOfFile+1]+ranks[indexOfRank-1];
-    potentialMoves[4] = files[indexOfFile-1]+ranks[indexOfRank-1];
-    potentialMoves[5] = files[indexOfFile-1]+ranks[indexOfRank+1];
-    potentialMoves[6] = files[indexOfFile+1]+rank;
-    potentialMoves[7] = files[indexOfFile-1]+rank;
-    potentialMoves[8] = 'K-Castle';
-    potentialMoves[9] = 'Q-Castle';
-    potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
-    
-    console.log(potentialMoves);
-    
-    return potentialMoves;
-
-  }
-
-  handleClick(){
-    const potentialMoves = this.calculatePotentialMoves(this.props.coordinate);
-    this.props.onClick(this.props.coordinate, 
-      {
-        piece: 'K', color: this.props.color, potentialMoves: potentialMoves
-      });
-  }
-
-  render() {
-    return (
-      <p onClick={()=>this.handleClick()}>K</p>
-    );
-  }
-}
-
-class NoPiece extends React.Component {
-
-  handleClick() {
-    this.props.onClick(this.props.coordinate, null);
-  }
-
-  render() {
-    
-    return (
-      <p onClick={()=>this.handleClick()}></p>
-    );
-  }
-}
+import {Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
 
 class Square extends React.Component {
 
@@ -372,14 +10,15 @@ class Square extends React.Component {
 
     const color = pieceObj.color;
     const pieceName = pieceObj.piece;
+    //does no piece need the board?
     const pieceMap = 
       new Map([
-        ['P', <Pawn color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
-        ['N', <Knight color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
-        ['B', <Bishop color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
-        ['R', <Rook color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
-        ['Q', <Queen color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
-        ['K', <King color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>],
+        ['P', <Pawn board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['N', <Knight board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['B', <Bishop board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['R', <Rook board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['Q', <Queen board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['K', <King board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>],
         ['', <NoPiece color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>]
       ]);
 
@@ -409,6 +48,7 @@ class Board extends React.Component {
         color={(bool) ? "light": "dark"}
         coordinate={coordinate} 
         piece={piece}
+        board={this.props.board}
         onClick={(coordinate, pieceObj) => this.props.onClick(coordinate, pieceObj)}/>
     );
   }
@@ -520,7 +160,7 @@ class Game extends React.Component {
     const historyLength = this.state.history.length;
     
 
-    if(!this.state.selectedPiece && !pieceObj.piece) {
+    if(!this.state.selectedPiece && !pieceObj) {
       return;
     }
 
@@ -558,6 +198,7 @@ class Game extends React.Component {
       ]),
       selectedPiece: null
     });
+    console.log(new Rook().calculatePotentialMoves('h8'));
 
     console.log(boardMap);
   }

@@ -10,15 +10,16 @@ class Square extends React.Component {
 
     const color = pieceObj.color;
     const pieceName = pieceObj.piece;
+    const moved = pieceObj.moved;
     //does no piece need the board?
     const pieceMap = 
       new Map([
-        ['P', <Pawn board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['P', <Pawn board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['N', <Knight board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['B', <Bishop board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
-        ['R', <Rook board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['R', <Rook board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['Q', <Queen board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
-        ['K', <King board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>],
+        ['K', <King board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>],
         ['', <NoPiece color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>]
       ]);
 
@@ -104,9 +105,10 @@ class Game extends React.Component {
               ['a8', {piece: 'R', color: 'black'}], ['b8', {piece: 'N', color: 'black'}], ['c8', {piece: 'B', color: 'black'}], 
                 ['d8', {piece: 'Q', color: 'black'}], ['e8', {piece: 'K', color: 'black'}], ['f8', {piece: 'B', color: 'black'}], 
                 ['g8', {piece: 'N', color: 'black'}], ['h8', {piece: 'R', color: 'black'}],
-              ['a7', {piece: 'P', color: 'black'}], ['b7', {piece: 'P', color: 'black'}], ['c7', {piece: 'P', color: 'black'}], 
-                ['d7', {piece: 'P', color: 'black'}], ['e7', {piece: 'P', color: 'black'}], ['f7', {piece: 'P', color: 'black'}], 
-                ['g7', {piece: 'P', color: 'black'}], ['h7', {piece: 'P', color: 'black'}],
+              ['a7', {piece: 'P', color: 'black', moved: false}], ['b7', {piece: 'P', color: 'black', moved: false}], 
+                ['c7', {piece: 'P', color: 'black', moved: false}], ['d7', {piece: 'P', color: 'black', moved: false}], 
+                ['e7', {piece: 'P', color: 'black', moved: false}], ['f7', {piece: 'P', color: 'black', moved: false}], 
+                ['g7', {piece: 'P', color: 'black', moved: false}], ['h7', {piece: 'P', color: 'black', moved: false}],
               ['a6', {piece: '', color: ''}], ['b6', {piece: '', color: ''}], ['c6', {piece: '', color: ''}], ['d6',{piece: '', color: ''}], 
                 ['e6', {piece: '', color: ''}], ['f6', {piece: '', color: ''}], ['g6', {piece: '', color: ''}], ['h6', {piece: '', color: ''}],
               ['a5', {piece: '', color: ''}], ['b5', {piece: '', color: ''}], ['c5', {piece: '', color: ''}], ['d5',{piece: '', color: ''}], 
@@ -115,9 +117,10 @@ class Game extends React.Component {
                 ['e4', {piece: '', color: ''}], ['f4', {piece: '', color: ''}], ['g4', {piece: '', color: ''}], ['h4', {piece: '', color: ''}],
               ['a3', {piece: '', color: ''}], ['b3', {piece: '', color: ''}], ['c3', {piece: '', color: ''}], ['d3',{piece: '', color: ''}], 
                 ['e3', {piece: '', color: ''}], ['f3', {piece: '', color: ''}], ['g3', {piece: '', color: ''}], ['h3', {piece: '', color: ''}],
-              ['a2', {piece: 'P', color: 'white'}], ['b2', {piece: 'P', color: 'white'}], ['c2', {piece: 'P', color: 'white'}], 
-                ['d2', {piece: 'P', color: 'white'}], ['e2', {piece: 'P', color: 'white'}], ['f2', {piece: 'P', color: 'white'}], 
-                ['g2', {piece: 'P', color: 'white'}], ['h2', {piece: 'P', color: 'white'}],
+              ['a2', {piece: 'P', color: 'white', moved: false}], ['b2', {piece: 'P', color: 'white', moved: false}], 
+                ['c2', {piece: 'P', color: 'white', moved: false}], ['d2', {piece: 'P', color: 'white', moved: false}], 
+                ['e2', {piece: 'P', color: 'white', moved: false}], ['f2', {piece: 'P', color: 'white', moved: false}], 
+                ['g2', {piece: 'P', color: 'white', moved: false}], ['h2', {piece: 'P', color: 'white', moved: false}],
               ['a1', {piece: 'R', color: 'white'}], ['b1', {piece: 'N', color: 'white'}], ['c1', {piece: 'B', color: 'white'}], 
                 ['d1', {piece: 'Q', color: 'white'}], ['e1', {piece: 'K', color: 'white'}], ['f1', {piece: 'B', color: 'white'}], 
                 ['g1', {piece: 'N', color: 'white'}], ['h1', {piece: 'R', color: 'white'}]
@@ -187,7 +190,7 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
-    boardMap.set(coordinate, {piece: this.state.selectedPiece.symbol.piece, color: 'white'});
+    boardMap.set(coordinate, this.state.selectedPiece.symbol);
     boardMap.set(this.state.selectedPiece.coord, {piece: '', color: ''});
 
     this.setState({

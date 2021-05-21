@@ -6,7 +6,6 @@ import {Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
 class Square extends React.Component {
 
   renderPiece(pieceObj){
-    console.log("renderPiece");
 
     const color = pieceObj.color;
     const pieceName = pieceObj.piece;
@@ -41,8 +40,6 @@ class Square extends React.Component {
 class Board extends React.Component {
 
   renderSquare(coordinate, piece, bool) {
-    console.log("renderSqaure()");
-    
     return (
       <Square 
         key={coordinate} 
@@ -159,30 +156,84 @@ class Game extends React.Component {
 
   handleClick(coordinate, pieceObj) {
     console.log("handleClick()");
+    console.log(coordinate);
     console.log(pieceObj);
-    const historyLength = this.state.history.length;
+    //const historyLength = this.state.history.length;
     
-
     if(!this.state.selectedPiece && !pieceObj) {
       return;
     }
 
     if(!this.state.selectedPiece && pieceObj.piece) {
-      console.log("if");
       this.setState(
         {
-          selectedPiece: {coord: coordinate, symbol: pieceObj}
+          selectedPiece: {coordinate: coordinate, pieceObj: pieceObj}
         }
       );
 
       return;
     }
-    console.log(this.state);
 
-    console.log("movePiece()");
-    this.movePiece(coordinate);
-    
+    const legalMoves = this.state.selectedPiece.pieceObj.legalMoves;
 
+    if(legalMoves.includes(coordinate)) {
+      this.movePiece(coordinate);
+    }
+
+    this.setState(
+      {
+        selectedPiece: null
+      }
+    );
+
+  }
+
+  getPieceInstance(pieceObj, coordinate) {
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+
+    switch(pieceObj.piece){
+      case 'P':
+        return new Pawn({
+          board: boardMap,
+          color: pieceObj.color,
+          moved: pieceObj.moved,
+          coordinate: coordinate
+        });
+      case 'N':
+        return new Knight({
+          board: boardMap,
+          color: pieceObj.color,
+          coordinate: coordinate
+        });
+      case 'B':
+        return new Bishop({
+          board: boardMap,
+          color: pieceObj.color,
+          coordinate: coordinate
+        });
+      case 'R':
+        return new Rook({
+          board: boardMap,
+          color: pieceObj.color,
+          coordinate: coordinate
+        });
+      case 'Q':
+        return new Queen({
+          board: boardMap,
+          color: pieceObj.color,
+          coordinate: coordinate
+        });
+      case 'K':
+        return new King({
+          board: boardMap,
+          color: pieceObj.color,
+          moved: pieceObj.moved,
+          coordinate: coordinate
+        });
+      default: return;
+    }
   }
 
   movePiece(coordinate) {
@@ -190,8 +241,8 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
-    boardMap.set(coordinate, this.state.selectedPiece.symbol);
-    boardMap.set(this.state.selectedPiece.coord, {piece: '', color: ''});
+    boardMap.set(coordinate, this.state.selectedPiece.pieceObj);
+    boardMap.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
 
     this.setState({
       history: history.concat([
@@ -201,7 +252,6 @@ class Game extends React.Component {
       ]),
       selectedPiece: null
     });
-    console.log(new Rook().calculatePotentialMoves('h8'));
 
     console.log(boardMap);
   }
@@ -210,8 +260,6 @@ class Game extends React.Component {
     const historyLength = this.state.history.length;
     const current = this.state.history[historyLength-1];
    
-    console.log(current.board);
-
     return (
       <Board onClick={(coordinate, piece) => this.handleClick(coordinate, piece)} board={current.board}/>
     );

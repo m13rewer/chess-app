@@ -542,8 +542,41 @@ class Pawn extends React.Component {
     }
     getLegalMoves(potentialMoves) {
       const allSquaresHit = this.getAllSquaresHit();
-      const legalMoves = potentialMoves.filter(element => !allSquaresHit.includes(element));
+      const potentialMovesNotHit = potentialMoves.filter(element => !allSquaresHit.includes(element));
+      
+      const legalMovesWithoutCastles = potentialMovesNotHit.filter(element => this.props.board.get(element).color !== this.props.color);
+      const castles = this.canCastle(this.props.color);
+      const legalMoves = legalMovesWithoutCastles.concat(castles);
       return legalMoves;
+    }
+    
+    canCastle(color) {
+      let castles = [];
+      const boardMap = this.props.board;
+      if(this.props.moved) {
+        return '';
+      }
+      if(color === 'white') {
+        if(!boardMap.get('g1').piece && !boardMap.get('f1').piece && !boardMap.get('h1').moved) {
+          castles[0] = 'K-Castle';
+        }
+        if(!boardMap.get('b1').piece && !boardMap.get('c1').piece && !boardMap.get('a1').moved) {
+          castles[1] = 'Q-Castle';
+        }
+        
+        return castles;
+      }
+
+      if(color === 'black') {
+        if(!boardMap.get('g8').piece && !boardMap.get('f8').piece && !boardMap.get('h8').moved) {
+          castles[0] = 'K-Castle';
+        }
+        if(!boardMap.get('b8').piece && !boardMap.get('c8').piece && !boardMap.get('a8').moved) {
+          castles[1] = 'Q-Castle';
+        }
+        return castles;
+      }
+
     }
     getAllSquaresHit() {
       const boardMap = this.props.board;
@@ -551,7 +584,6 @@ class Pawn extends React.Component {
       
       boardMap.forEach((value, key) => {
         if(value.piece && value.color !== this.props.color) {
-          console.log(key);
           switch(value.piece){
             case 'P':
 
@@ -624,18 +656,18 @@ class Pawn extends React.Component {
       potentialMoves[5] = '' + files[indexOfFile-1]+ranks[indexOfRank+1];
       potentialMoves[6] = '' + files[indexOfFile+1]+rank;
       potentialMoves[7] = '' + files[indexOfFile-1]+rank;
-      potentialMoves[8] = 'K-Castle';
-      potentialMoves[9] = 'Q-Castle';
+      // potentialMoves[8] = 'K-Castle';
+      // potentialMoves[9] = 'Q-Castle';
       potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
       
       console.log(potentialMoves);
       
       return potentialMoves;
-  
     }
   
     handleClick(){
       const legalMoves = this.getLegalMoves(this.calculatePotentialMoves(this.props.coordinate));
+      console.log(legalMoves);
       this.props.onClick(this.props.coordinate, 
         {
           piece: 'K', color: this.props.color, legalMoves: legalMoves

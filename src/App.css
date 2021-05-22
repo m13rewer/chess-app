@@ -60,3 +60,23 @@ img{
     float: left;
     clear: left;
 }
+
+.light-square {
+    background-color: azure;
+}
+
+.dark-square {
+    background-color: lightskyblue;
+}
+
+.white {
+    color: rgb(179, 179, 179);
+}
+
+i {
+    margin-top: 20%;
+    margin-left: 20%;
+    width: 60%;
+    text-align: center;
+    font-size: 25px;
+}

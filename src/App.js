@@ -175,8 +175,10 @@ class Game extends React.Component {
     }
 
     const legalMoves = this.state.selectedPiece.pieceObj.legalMoves;
-
+    console.log(legalMoves.includes(coordinate));
+    console.log(coordinate)
     if(legalMoves.includes(coordinate)) {
+      console.log("coordinateMatches");
       this.movePiece(coordinate);
     }
 

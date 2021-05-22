@@ -114,6 +114,7 @@ class Pawn extends React.Component {
     }
   
     handleClick(){
+      console.log("handlePawnClick")
       const legalMoves = this.getLegalMoves(this.props.coordinate, this.calculatePotentialMoves(this.props.coordinate));
       this.props.onClick(this.props.coordinate, 
         {
@@ -123,7 +124,7 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <p onClick={()=>this.handleClick()}>P</p>
+        <i onClick={()=>this.handleClick()} class={"fas fa-chess-pawn "+this.props.color}></i>
       );
     }
   }
@@ -187,7 +188,7 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <p onClick={()=>this.handleClick()}>N</p>
+        <i onClick={()=>this.handleClick()} class={"fas fa-chess-knight "+this.props.color}></i>
       );
     }
   }
@@ -287,13 +288,13 @@ class Pawn extends React.Component {
       const legalMoves = this.getLegalMoves(this.calculatePotentialMoves(this.props.coordinate));
       this.props.onClick(this.props.coordinate, 
         {
-          piece: 'B', color: this.props.color, legalMoves: legalMoves
+          piece: 'B', color: this.props.color, legalMoves: legalMoves.flat()
         });
     }
   
     render() {
       return (
-        <p onClick={()=>this.handleClick()}>B</p>
+        <i onClick={()=>this.handleClick()} class={"fas fa-chess-bishop "+this.props.color}></i>
       );
     }
   }
@@ -379,13 +380,14 @@ class Pawn extends React.Component {
       const legalMoves = this.getLegalMoves(this.calculatePotentialMoves(this.props.coordinate));
       this.props.onClick(this.props.coordinate, 
         {
-          piece: 'R', color: this.props.color, legalMoves: legalMoves
+          piece: 'R', color: this.props.color, legalMoves: legalMoves.flat()
         });
     }
   
     render() {
       return (
-        <p onClick={()=>this.handleClick()}>R</p>
+        // <p onClick={()=>this.handleClick()}>R</p>
+        <i onClick={()=>this.handleClick()} class={"fas fa-chess-rook "+this.props.color}></i>
       );
     }
   }
@@ -524,13 +526,14 @@ class Pawn extends React.Component {
       const legalMoves = this.getLegalMoves(this.calculatePotentialMoves(this.props.coordinate));
       this.props.onClick(this.props.coordinate, 
         {
-          piece: 'Q', color: this.props.color, legalMoves: legalMoves
+          piece: 'Q', color: this.props.color, legalMoves: legalMoves.flat()
         });
     }
   
     render() {
       return (
-        <p onClick={()=>this.handleClick()}>Q</p>
+        //<p onClick={()=>this.handleClick()}>Q</p>
+        <i onClick={()=>this.handleClick()} class={"fas fa-chess-queen "+this.props.color}></i>
       );
     }
   }
@@ -676,7 +679,7 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <p onClick={()=>this.handleClick()}>K</p>
+        <i onClick={()=>this.handleClick()} class={"fas fa-chess-king "+this.props.color}></i>
       );
     }
   }

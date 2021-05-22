@@ -61,24 +61,49 @@ class Pawn extends React.Component {
       let legalMoves = [];
       let pieceObj;
 
-      for(let i = 0; i < potentialMoves.length; i++) {
-        pieceObj = boardMap.get(potentialMoves[i]);
-
-        if(potentialMoves[i].substring(0, 1) !== file && pieceObj.piece) {
-          if(pieceObj.color !== this.props.color) legalMoves[i] = potentialMoves[i];
-          continue;
+      if(this.props.color === 'white') {
+        for(let i = 0; i < potentialMoves.length; i++) {
+          pieceObj = boardMap.get(potentialMoves[i]);
+  
+          if(potentialMoves[i].substring(0, 1) !== file && pieceObj.piece) {
+            if(pieceObj.color !== this.props.color) legalMoves[i] = potentialMoves[i];
+            continue;
+          }
+  
+          if(potentialMoves[i] === file + (Number.parseInt(rank)+1) && pieceObj.piece) {
+            return;
+          }
+  
+          if(potentialMoves[i] === file + (Number.parseInt(rank)+1) && !pieceObj.piece) {
+            legalMoves[i] = potentialMoves[i];
+          }
+  
+          if(potentialMoves[i] === file + (Number.parseInt(rank)+2) && !pieceObj.piece) {
+            legalMoves[i] = potentialMoves[i];
+          }
         }
+      }
 
-        if(potentialMoves[i] === file + (Number.parseInt(rank)+1) && pieceObj.piece) {
-          return;
-        }
-
-        if(potentialMoves[i] === file + (Number.parseInt(rank)+1) && !pieceObj.piece) {
-          legalMoves[i] = potentialMoves[i];
-        }
-
-        if(potentialMoves[i] === file + (Number.parseInt(rank)+2) && !pieceObj.piece) {
-          legalMoves[i] = potentialMoves[i];
+      if(this.props.color === 'black') {
+        for(let i = 0; i < potentialMoves.length; i++) {
+          pieceObj = boardMap.get(potentialMoves[i]);
+  
+          if(potentialMoves[i].substring(0, 1) !== file && pieceObj.piece) {
+            if(pieceObj.color !== this.props.color) legalMoves[i] = potentialMoves[i];
+            continue;
+          }
+  
+          if(potentialMoves[i] === file + (Number.parseInt(rank)-1) && pieceObj.piece) {
+            return;
+          }
+  
+          if(potentialMoves[i] === file + (Number.parseInt(rank)-1) && !pieceObj.piece) {
+            legalMoves[i] = potentialMoves[i];
+          }
+  
+          if(potentialMoves[i] === file + (Number.parseInt(rank)-2) && !pieceObj.piece) {
+            legalMoves[i] = potentialMoves[i];
+          }
         }
       } 
 
@@ -131,7 +156,7 @@ class Pawn extends React.Component {
 
   class Knight extends React.Component {
     squaresHit(coordinate) {
-      return this.getLegalMoves(this.calculatePotentialMoves(coordinate));
+      return this.calculatePotentialMoves(coordinate);
     }
 
     getLegalMoves(potentialMoves) {

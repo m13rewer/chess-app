@@ -231,7 +231,7 @@ class Game extends React.Component {
     const boardMap = board;
     const whiteToMove = this.state.whiteToMove;
     const color = whiteToMove ? 'white' : 'black';
-    const coordinate = this.findAPiece('K', color, boardMap);
+    const coordinate = this.findKing('K', color, boardMap);
 
     const king = new King({
       board: boardMap,
@@ -248,13 +248,17 @@ class Game extends React.Component {
     
   }
 
-  findAPiece(piece, color, board) {
+  findKing(piece, color, board) {
     const boardMap = board;
-    const key = boardMap.forEach((value, key) => {
-      if(value.piece === piece && value.color === color) return key;
+    let coordinate;
+
+    boardMap.forEach((value, key) => {
+      if(value.piece === piece && value.color === color) {
+        coordinate = key;
+      }
     });
 
-    return key;
+    return coordinate;
   }
 
   isCastle(selectedPiece, coordinate) {
@@ -276,7 +280,7 @@ class Game extends React.Component {
       boardMap.set('f1', {piece: 'R', color: 'white', moved: true}); 
       boardMap.set('e1', {piece: '', color: ''});
       boardMap.set('h1', {piece: '', color: ''});
-
+      console.log()
       if(this.isCheck(boardMap)) {
         return false;
       }
@@ -289,6 +293,7 @@ class Game extends React.Component {
         ]),
         selectedPiece: null
       });
+
       return true;
     }
 
@@ -429,12 +434,18 @@ class Game extends React.Component {
       this.isCastle(selectedPiece, coordinate);
       return;
     }
-    boardMap.set(coordinate, this.state.selectedPiece.pieceObj);
-    boardMap.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
+    
+    const boardMapCopy = new Map(Array.from(boardMap));
+    boardMapCopy.set(coordinate, this.state.selectedPiece.pieceObj);
+    boardMapCopy.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
 
-    if(this.isCheck(boardMap)) {
+    if(this.isCheck(boardMapCopy)) {
+      this.unselect();
       return;
     }
+
+    boardMap.set(coordinate, this.state.selectedPiece.pieceObj);
+    boardMap.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
 
     this.setState({
       history: history.concat([

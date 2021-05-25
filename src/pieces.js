@@ -582,14 +582,14 @@ class Pawn extends React.Component {
       let castles = [];
       const boardMap = this.props.board;
       if(this.props.moved) {
-        return '';
+        return [];
       }
       if(color === 'white') {
         if(!boardMap.get('g1').piece && !boardMap.get('f1').piece && !boardMap.get('h1').moved) {
-          castles[0] = 'K-Castle';
+          castles[0] = 'g1';
         }
         if(!boardMap.get('b1').piece && !boardMap.get('c1').piece && !boardMap.get('a1').moved) {
-          castles[1] = 'Q-Castle';
+          castles[1] = 'c1';
         }
         
         return castles;
@@ -597,10 +597,10 @@ class Pawn extends React.Component {
 
       if(color === 'black') {
         if(!boardMap.get('g8').piece && !boardMap.get('f8').piece && !boardMap.get('h8').moved) {
-          castles[0] = 'K-Castle';
+          castles[0] = 'g8';
         }
         if(!boardMap.get('b8').piece && !boardMap.get('c8').piece && !boardMap.get('a8').moved) {
-          castles[1] = 'Q-Castle';
+          castles[1] = 'c8';
         }
         return castles;
       }

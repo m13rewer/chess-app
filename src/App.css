@@ -1,6 +1,6 @@
 .square {
     /* display: inline-block; */
-    border: solid black 1px;
+    /* border: solid black 1px; */
     height: 40px;
     width: 40px;
     float: left;
@@ -70,7 +70,7 @@ img{
 }
 
 .white {
-    color: rgb(179, 179, 179);
+    color: lightgrey;
 }
 
 i {

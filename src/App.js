@@ -99,9 +99,9 @@ class Game extends React.Component {
         history: [
           {
             board: new Map([
-              ['a8', {piece: 'R', color: 'black'}], ['b8', {piece: 'N', color: 'black'}], ['c8', {piece: 'B', color: 'black'}], 
-                ['d8', {piece: 'Q', color: 'black'}], ['e8', {piece: 'K', color: 'black'}], ['f8', {piece: 'B', color: 'black'}], 
-                ['g8', {piece: 'N', color: 'black'}], ['h8', {piece: 'R', color: 'black'}],
+              ['a8', {piece: 'R', color: 'black', moved: false}], ['b8', {piece: 'N', color: 'black'}], ['c8', {piece: 'B', color: 'black'}], 
+                ['d8', {piece: 'Q', color: 'black'}], ['e8', {piece: 'K', color: 'black', moved: false}], ['f8', {piece: 'B', color: 'black'}], 
+                ['g8', {piece: 'N', color: 'black'}], ['h8', {piece: 'R', color: 'black', moved: false}],
               ['a7', {piece: 'P', color: 'black', moved: false}], ['b7', {piece: 'P', color: 'black', moved: false}], 
                 ['c7', {piece: 'P', color: 'black', moved: false}], ['d7', {piece: 'P', color: 'black', moved: false}], 
                 ['e7', {piece: 'P', color: 'black', moved: false}], ['f7', {piece: 'P', color: 'black', moved: false}], 
@@ -118,50 +118,40 @@ class Game extends React.Component {
                 ['c2', {piece: 'P', color: 'white', moved: false}], ['d2', {piece: 'P', color: 'white', moved: false}], 
                 ['e2', {piece: 'P', color: 'white', moved: false}], ['f2', {piece: 'P', color: 'white', moved: false}], 
                 ['g2', {piece: 'P', color: 'white', moved: false}], ['h2', {piece: 'P', color: 'white', moved: false}],
-              ['a1', {piece: 'R', color: 'white'}], ['b1', {piece: 'N', color: 'white'}], ['c1', {piece: 'B', color: 'white'}], 
-                ['d1', {piece: 'Q', color: 'white'}], ['e1', {piece: 'K', color: 'white'}], ['f1', {piece: 'B', color: 'white'}], 
-                ['g1', {piece: 'N', color: 'white'}], ['h1', {piece: 'R', color: 'white'}]
+              ['a1', {piece: 'R', color: 'white', moved: false}], ['b1', {piece: 'N', color: 'white'}], ['c1', {piece: 'B', color: 'white'}], 
+                ['d1', {piece: 'Q', color: 'white'}], ['e1', {piece: 'K', color: 'white', moved: false}], ['f1', {piece: 'B', color: 'white'}], 
+                ['g1', {piece: 'N', color: 'white'}], ['h1', {piece: 'R', color: 'white', moved: false}]
             ])
           }
         ],
-        player: {color: '', result: '', isMyTurn: false},
+        player: {color: '', isMyTurn: false, status: ''},
         selectedPiece: null,
         moves: [],
-        pieces: []
+        pieces: [],
+        check: null,
+        whiteToMove: true
       }
   }
 
   startGame() {
-
-  }
-
-  calculateLegalMoves() {
-
-  }
-
-  isLegalMove(coordinate) {
-    const history = this.state.history.slice(0, 1);
-    const current = history[history.length - 1];
-    const boardMap = current.board;
-    const playerColor = this.state.player.color;
-
-    const askingDestination = boardMap.get(coordinate);
-
-    if(askingDestination.color === playerColor) {
-
-    }
-
-    return false;
-  }
-
-  handleClick(coordinate, pieceObj) {
-    console.log("handleClick()");
-    console.log(coordinate);
-    console.log(pieceObj);
-    //const historyLength = this.state.history.length;
+    //we make some kind of api call
+    this.fakeApiCall();
     
+    console.log(this.state);
+
+  }
+
+  fakeApiCall() {
+    const wb = Math.floor(Math.random() * 2) === 0;
+    this.setState({
+      player: {color: 'white', status: 'playing', isMyTurn: true}
+    });
+  }
+
+  pieceSelection(coordinate, pieceObj) {
+    console.log("pieceSelection")
     if(!this.state.selectedPiece && !pieceObj) {
-      return;
+      return true;
     }
 
     if(!this.state.selectedPiece && pieceObj.piece) {
@@ -171,22 +161,170 @@ class Game extends React.Component {
         }
       );
 
-      return;
+      return true;
     }
 
-    const legalMoves = this.state.selectedPiece.pieceObj.legalMoves;
-    console.log(legalMoves.includes(coordinate));
-    console.log(coordinate)
-    if(legalMoves.includes(coordinate)) {
-      console.log("coordinateMatches");
-      this.movePiece(coordinate);
+    if(this.state.selectedPiece && !pieceObj) return false;
+
+    if(this.state.selectedPiece && pieceObj.piece && this.state.selectedPiece.color && pieceObj.piece.color) {
+      this.setState(
+        {
+          selectedPiece: {coordinate: coordinate, pieceObj: pieceObj}
+        }
+      );
+
+      return true;
     }
 
+    return false;
+  }
+
+  unselect() {
     this.setState(
       {
         selectedPiece: null
       }
     );
+  }
+
+  handleClick(coordinate, pieceObj) {
+    console.log("handleClick()");
+    console.log(coordinate);
+    console.log(pieceObj);
+    const player = this.state.player;
+    //const historyLength = this.state.history.length;
+
+    if(this.pieceSelection(coordinate, pieceObj)) return;
+
+    const selectedPiece = this.state.selectedPiece;
+
+    if(selectedPiece.pieceObj.color !== player.color) {
+      this.unselect();
+      return;
+    }
+    const legalMoves = selectedPiece.pieceObj.legalMoves;
+    
+    if(legalMoves.includes(coordinate)) {
+      console.log("coordinateMatches");
+      this.movePiece(coordinate);
+      this.switchTurns();
+      return;
+    }
+
+    this.unselect();
+
+  }
+
+  switchTurns() {
+    const whiteToMove = this.state.whiteToMove;
+    this.setState({
+      whiteToMove: !whiteToMove,
+      player: {color: !whiteToMove ? 'white': 'black', isMyTurn: true, status: 'playing'} //this is temporary because we will never change player color during a real game
+    });
+  }
+
+  isCheckmate() {
+
+  }
+
+  isCheck() {
+
+  }
+
+  isCastle(selectedPiece, coordinate) {
+    if(selectedPiece.pieceObj.color === 'white' && coordinate === 'g1') return this.kingSideCastle('white');
+    if(selectedPiece.pieceObj.color === 'white' && coordinate === 'c1') return this.queenSideCastle('white');
+    if(selectedPiece.pieceObj.color === 'black' && coordinate === 'g8') return this.kingSideCastle('black');
+    if(selectedPiece.pieceObj.color === 'black' && coordinate === 'c8') return this.queenSideCastle('black');
+
+    return false;
+  }
+
+  kingSideCastle(color) {
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+
+    if(color === 'white') {
+      boardMap.set('g1', {piece: 'K', color: 'white', moved: true});
+      boardMap.set('f1', {piece: 'R', color: 'white', moved: true}); 
+      boardMap.set('e1', {piece: '', color: ''});
+      boardMap.set('h1', {piece: '', color: ''});
+
+      this.setState({
+        history: history.concat([
+          {
+            board: boardMap
+          }
+        ]),
+        selectedPiece: null
+      });
+      return true;
+    }
+
+    if(color === 'black') {
+      boardMap.set('g8', {piece: 'K', color: 'black', moved: true});
+      boardMap.set('f8', {piece: 'R', color: 'black', moved: true});
+      boardMap.set('e8', {piece: '', color: ''});
+      boardMap.set('h8', {piece: '', color: ''});
+
+      this.setState({
+        history: history.concat([
+          {
+            board: boardMap
+          }
+        ]),
+        selectedPiece: null
+      });
+      return true;
+    }
+  }
+
+  queenSideCastle(color) {
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+
+    if(color === 'white') {
+      boardMap.set('c1', {piece: 'K', color: 'white', moved: true});
+      boardMap.set('d1', {piece: 'R', color: 'white', moved: true}); 
+      boardMap.set('e1', {piece: '', color: ''});
+      boardMap.set('a1', {piece: '', color: ''});
+
+      this.setState({
+        history: history.concat([
+          {
+            board: boardMap
+          }
+        ]),
+        selectedPiece: null
+      });
+      return true;
+    }
+
+    if(color === 'black') {
+      boardMap.set('c8', {piece: 'K', color: 'black', moved: true});
+      boardMap.set('d8', {piece: 'R', color: 'black', moved: true});
+      boardMap.set('e8', {piece: '', color: ''});
+      boardMap.set('a8', {piece: '', color: ''});
+
+      this.setState({
+        history: history.concat([
+          {
+            board: boardMap
+          }
+        ]),
+        selectedPiece: null
+      });
+      return true;
+    }
+  }
+
+  promote() {
+
+  }
+
+  enPassant() {
 
   }
 
@@ -243,6 +381,11 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
+    const selectedPiece = this.state.selectedPiece;
+
+    if(selectedPiece.pieceObj.piece === 'K' && !selectedPiece.pieceObj.moved) {
+      this.isCastle(selectedPiece, coordinate);
+    }
     boardMap.set(coordinate, this.state.selectedPiece.pieceObj);
     boardMap.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
 
@@ -263,7 +406,10 @@ class Game extends React.Component {
     const current = this.state.history[historyLength-1];
    
     return (
-      <Board onClick={(coordinate, piece) => this.handleClick(coordinate, piece)} board={current.board}/>
+      <div>
+        <Board onClick={(coordinate, piece) => this.handleClick(coordinate, piece)} board={current.board}/>
+        <button onClick={() => this.startGame()}>Create Game</button>
+      </div>
     );
   }
 }
@@ -275,6 +421,7 @@ function App() {
         
       </header>
       <Game />
+      
     </div>
   );
 }

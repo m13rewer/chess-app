@@ -227,8 +227,34 @@ class Game extends React.Component {
 
   }
 
-  isCheck() {
+  isCheck(board) {
+    const boardMap = board;
+    const whiteToMove = this.state.whiteToMove;
+    const color = whiteToMove ? 'white' : 'black';
+    const coordinate = this.findAPiece('K', color, boardMap);
 
+    const king = new King({
+      board: boardMap,
+      color: color,
+      moved: false,
+      coordinate: coordinate
+    });
+
+    const allSquaresHit = king.getAllSquaresHit();
+
+    if(allSquaresHit.includes(coordinate)) return true;
+
+    return false;
+    
+  }
+
+  findAPiece(piece, color, board) {
+    const boardMap = board;
+    const key = boardMap.forEach((value, key) => {
+      if(value.piece === piece && value.color === color) return key;
+    });
+
+    return key;
   }
 
   isCastle(selectedPiece, coordinate) {
@@ -251,6 +277,10 @@ class Game extends React.Component {
       boardMap.set('e1', {piece: '', color: ''});
       boardMap.set('h1', {piece: '', color: ''});
 
+      if(this.isCheck(boardMap)) {
+        return false;
+      }
+
       this.setState({
         history: history.concat([
           {
@@ -267,6 +297,10 @@ class Game extends React.Component {
       boardMap.set('f8', {piece: 'R', color: 'black', moved: true});
       boardMap.set('e8', {piece: '', color: ''});
       boardMap.set('h8', {piece: '', color: ''});
+
+      if(this.isCheck(boardMap)) {
+        return false;
+      }
 
       this.setState({
         history: history.concat([
@@ -291,6 +325,10 @@ class Game extends React.Component {
       boardMap.set('e1', {piece: '', color: ''});
       boardMap.set('a1', {piece: '', color: ''});
 
+      if(this.isCheck(boardMap)) {
+        return false;
+      }
+
       this.setState({
         history: history.concat([
           {
@@ -307,6 +345,10 @@ class Game extends React.Component {
       boardMap.set('d8', {piece: 'R', color: 'black', moved: true});
       boardMap.set('e8', {piece: '', color: ''});
       boardMap.set('a8', {piece: '', color: ''});
+
+      if(this.isCheck(boardMap)) {
+        return false;
+      }
 
       this.setState({
         history: history.concat([
@@ -385,9 +427,14 @@ class Game extends React.Component {
 
     if(selectedPiece.pieceObj.piece === 'K' && !selectedPiece.pieceObj.moved) {
       this.isCastle(selectedPiece, coordinate);
+      return;
     }
     boardMap.set(coordinate, this.state.selectedPiece.pieceObj);
     boardMap.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
+
+    if(this.isCheck(boardMap)) {
+      return;
+    }
 
     this.setState({
       history: history.concat([

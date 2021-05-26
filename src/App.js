@@ -424,7 +424,6 @@ class Game extends React.Component {
   }
 
   movePiece(coordinate) {
-
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
@@ -434,7 +433,7 @@ class Game extends React.Component {
       this.isCastle(selectedPiece, coordinate);
       return;
     }
-    
+
     const boardMapCopy = new Map(Array.from(boardMap));
     boardMapCopy.set(coordinate, this.state.selectedPiece.pieceObj);
     boardMapCopy.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});

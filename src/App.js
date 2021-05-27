@@ -250,20 +250,21 @@ class Game extends React.Component {
     });
 
   }
-  findBlockingMove() {
-    //TODO
-  }
+  // findBlockingMove() {
+  //   //TODO
+  // }
 
   getInCheckLegalMoves(board) {
     const whiteToMove = this.state.whiteToMove;
     const turnColor = whiteToMove ? 'white': 'black'
     const sourcesOfCheck = this.state.sourcesOfCheck;
-    const inCheckLegalMoves = [];
+    const eliminateSourceOfCheckMove = [];
+    let captureAndBlockingMoves = [];
     const coordinate = this.findKing(color, boardMap);
 
     if(sourcesOfCheck.length === 1) {
-      inCheckLegalMoves.unshift(sourcesOfCheck[0].coordinate); 
-      this.findBlockingMove(sourcesOfCheck[0]);
+      eliminateSourceOfCheckMove.unshift(sourcesOfCheck[0].coordinate); 
+      captureAndBlockingMoves = eliminateSourceOfCheckMove.concat(sourcesOfCheck[0].path);
     }
 
     const king = new King({
@@ -274,6 +275,9 @@ class Game extends React.Component {
     });
 
     const legalKingMoves = king.getLegalMoves(king.calculatePotentialMoves(coordinate));
+    const inCheckLegalMoves = captureAndBlockingMoves.concat(legalKingMoves);
+
+    return inCheckLegalMoves;
   }
 
   isCheckmate() {
@@ -310,6 +314,8 @@ class Game extends React.Component {
     let traverseFiles = indexOfFile+1;
     let traverseRanks = indexOfRank+1;
     let piecesFound = [];
+    let path = [];
+    let pathIncrement = 0;
     let squareChecked;
     let coordCheck;
 
@@ -318,58 +324,71 @@ class Game extends React.Component {
     while(files[traverseFiles]) {
       coordCheck = files[traverseFiles] + ranks;
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseFiles++;
       i++;
+      pathIncrement++;
     }
 
+    pathIncrement = 0;
+    path = [];
     traverseFiles = indexOfFile-1;
     
     while(files[traverseFiles]) {
       coordCheck = files[traverseFiles] + ranks;
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseFiles--;
       i++;
+      pathIncrement++;
     }
 
-    
+    pathIncrement = 0;
+    path = [];
     while(ranks[traverseRanks]) {
       coordCheck = files + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseRanks++;
       i++;
+      pathIncrement++;
     }
 
+    pathIncrement = 0;
+    path = [];
     traverseRanks = indexOfRank-1;
     
     while(files[traverseFiles]) {
       coordCheck = files + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseRanks--;
       i++;
+      pathIncrement++;
     }
 
     return piecesFound;
@@ -473,6 +492,8 @@ class Game extends React.Component {
     let traverseFiles = indexOfFile+1;
     let traverseRanks = indexOfRank+1;
     let piecesFound = [];
+    let path = [];
+    let pathIncrement = 0;
     let squareChecked;
     let coordCheck;
     let i = 0;
@@ -480,66 +501,80 @@ class Game extends React.Component {
     while(files[traverseFiles] && ranks[traverseRanks]) {
       coordCheck = files[traverseFiles] + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseFiles++;
       traverseRanks++;
       i++;
+      pathIncrement++;
     }
 
+    pathIncrement = 0;
+    path = [];
     traverseFiles = indexOfFile-1;
     traverseRanks = indexOfRank-1;
 
     while(files[traverseFiles] && ranks[traverseRanks]) {
       coordCheck = files[traverseFiles] + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseFiles--;
       traverseRanks--;
       i++;
+      pathIncrement++;
     }
 
+    pathIncrement = 0;
+    path = [];
     traverseFiles = indexOfFile+1;
     traverseRanks = indexOfRank-1;
 
     while(files[traverseFiles] && ranks[traverseRanks]) {
       coordCheck = files[traverseFiles] + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseFiles++;
       traverseRanks--;
       i++;
+      pathIncrement++;
     }
 
+    pathIncrement = 0;
+    path = [];
     traverseFiles = indexOfFile-1;
     traverseRanks = indexOfRank+1;
 
     while(files[traverseFiles] && ranks[traverseRanks]) {
       coordCheck = files[traverseFiles] + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
+      path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
-        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
       }
 
       traverseFiles--;
       traverseRanks++;
       i++;
+      pathIncrement++;
     }
 
     return piecesFound;

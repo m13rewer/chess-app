@@ -149,7 +149,7 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} class={"fas fa-chess-pawn "+this.props.color}></i>
+        <i onClick={()=>this.handleClick()} className={"fas fa-chess-pawn "+this.props.color}></i>
       );
     }
   }
@@ -213,7 +213,7 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} class={"fas fa-chess-knight "+this.props.color}></i>
+        <i onClick={()=>this.handleClick()} className={"fas fa-chess-knight "+this.props.color}></i>
       );
     }
   }
@@ -261,7 +261,7 @@ class Pawn extends React.Component {
       let vectorFour = [];
       
       let i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorOne[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles++;
         traverseRanks++;
@@ -272,7 +272,7 @@ class Pawn extends React.Component {
       traverseRanks = indexOfRank-1;
   
       i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorTwo[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles--;
         traverseRanks--;
@@ -283,7 +283,7 @@ class Pawn extends React.Component {
       traverseRanks = indexOfRank-1;
   
       i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorThree[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles++;
         traverseRanks--;
@@ -294,7 +294,7 @@ class Pawn extends React.Component {
       traverseRanks = indexOfRank+1;
   
       i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorFour[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles--;
         traverseRanks++;
@@ -319,7 +319,7 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} class={"fas fa-chess-bishop "+this.props.color}></i>
+        <i onClick={()=>this.handleClick()} className={"fas fa-chess-bishop "+this.props.color}></i>
       );
     }
   }
@@ -412,7 +412,7 @@ class Pawn extends React.Component {
     render() {
       return (
         // <p onClick={()=>this.handleClick()}>R</p>
-        <i onClick={()=>this.handleClick()} class={"fas fa-chess-rook "+this.props.color}></i>
+        <i onClick={()=>this.handleClick()} className={"fas fa-chess-rook "+this.props.color}></i>
       );
     }
   }
@@ -462,7 +462,7 @@ class Pawn extends React.Component {
       let vectorEight = [];
       
       let i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorOne[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles++;
         traverseRanks++;
@@ -473,7 +473,7 @@ class Pawn extends React.Component {
       traverseRanks = indexOfRank-1;
   
       i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorTwo[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles--;
         traverseRanks--;
@@ -484,7 +484,7 @@ class Pawn extends React.Component {
       traverseRanks = indexOfRank-1;
   
       i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorThree[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles++;
         traverseRanks--;
@@ -495,7 +495,7 @@ class Pawn extends React.Component {
       traverseRanks = indexOfRank+1;
   
       i = 0;
-      while(files[traverseFiles] && files[traverseRanks]) {
+      while(files[traverseFiles] && ranks[traverseRanks]) {
         vectorFour[i] = files[traverseFiles] + ranks[traverseRanks];
         traverseFiles--;
         traverseRanks++;
@@ -558,13 +558,14 @@ class Pawn extends React.Component {
     render() {
       return (
         //<p onClick={()=>this.handleClick()}>Q</p>
-        <i onClick={()=>this.handleClick()} class={"fas fa-chess-queen "+this.props.color}></i>
+        <i onClick={()=>this.handleClick()} className={"fas fa-chess-queen "+this.props.color}></i>
       );
     }
   }
   
   class King extends React.Component {
     squaresHit(coordinate) {
+      //I think i can take out this filter
       const squaresHit = this.calculatePotentialMoves(coordinate).filter(element => !element.includes('Castle'));
       return squaresHit;
     }
@@ -704,7 +705,7 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} class={"fas fa-chess-king "+this.props.color}></i>
+        <i onClick={()=>this.handleClick()} className={"fas fa-chess-king "+this.props.color}></i>
       );
     }
   }

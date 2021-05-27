@@ -10,7 +10,7 @@ class Square extends React.Component {
     const color = pieceObj.color;
     const pieceName = pieceObj.piece;
     const moved = pieceObj.moved;
-    //does no piece need the board?
+    
     const pieceMap = 
       new Map([
         ['P', <Pawn board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
@@ -192,6 +192,12 @@ class Game extends React.Component {
     console.log(coordinate);
     console.log(pieceObj);
     const player = this.state.player;
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+    const whiteToMove = this.state.whiteToMove;
+    const colorOfTurn = whiteToMove ? 'white': 'black';
+    
     //const historyLength = this.state.history.length;
 
     if(this.pieceSelection(coordinate, pieceObj)) return;
@@ -202,12 +208,33 @@ class Game extends React.Component {
       this.unselect();
       return;
     }
-    const legalMoves = selectedPiece.pieceObj.legalMoves;
+
+    let legalMoves; 
+
+    if(this.isCheck(boardMap)) {
+      const kingCoordinate = this.findKing(colorOfTurn, boardMap);
+      const sourcesOfCheck = this.sourcesOfCheck(kingCoordinate, colorOfTurn);
+
+      this.setState({
+        check: colorOfTurn,
+        sourcesOfCheck: sourcesOfCheck
+      });
+
+      legalMoves = this.getInCheckLegalMoves(boardMap);
+
+    } else {
+      legalMoves = selectedPiece.pieceObj.legalMoves;
+      this.setState({
+        check: null,
+        sourcesOfCheck: null
+      });
+    }
     
     if(legalMoves.includes(coordinate)) {
       console.log("coordinateMatches");
       this.movePiece(coordinate);
       this.switchTurns();
+
       return;
     }
 
@@ -221,17 +248,308 @@ class Game extends React.Component {
       whiteToMove: !whiteToMove,
       player: {color: !whiteToMove ? 'white': 'black', isMyTurn: true, status: 'playing'} //this is temporary because we will never change player color during a real game
     });
+
+  }
+  findBlockingMove() {
+    //TODO
+  }
+
+  getInCheckLegalMoves(board) {
+    const whiteToMove = this.state.whiteToMove;
+    const turnColor = whiteToMove ? 'white': 'black'
+    const sourcesOfCheck = this.state.sourcesOfCheck;
+    const inCheckLegalMoves = [];
+    const coordinate = this.findKing(color, boardMap);
+
+    if(sourcesOfCheck.length === 1) {
+      inCheckLegalMoves.unshift(sourcesOfCheck[0].coordinate); 
+      this.findBlockingMove(sourcesOfCheck[0]);
+    }
+
+    const king = new King({
+      board: boardMap,
+      color: turnColor,
+      moved: false,
+      coordinate: coordinate
+    });
+
+    const legalKingMoves = king.getLegalMoves(king.calculatePotentialMoves(coordinate));
   }
 
   isCheckmate() {
 
   }
 
+  sourcesOfCheck(kingCoordinate, colorInCheck) {
+    const sourcesOfCheck = this.rookPath(kingCoordinate, colorInCheck)
+    .concat(this.bishopPath(kingCoordinate, colorInCheck)
+      .concat(this.knightPath(kingCoordinate, colorInCheck)
+        .concat(this.pawnPath(kingCoordinate, colorInCheck))
+      )
+    );
+
+    // this.state.setState({
+    //   sourcesOfCheck: sourcesOfCheck
+    // });
+    
+    return sourcesOfCheck;
+  }
+
+  rookPath(coordinate, colorInCheck) {
+    const file = coordinate.substring(0, 1);
+    const rank = coordinate.substring(1);
+
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    const indexOfFile = files.indexOf(file);
+    const indexOfRank = ranks.indexOf(rank);
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+
+    let traverseFiles = indexOfFile+1;
+    let traverseRanks = indexOfRank+1;
+    let piecesFound = [];
+    let squareChecked;
+    let coordCheck;
+
+    let i = 0;
+
+    while(files[traverseFiles]) {
+      coordCheck = files[traverseFiles] + ranks;
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseFiles++;
+      i++;
+    }
+
+    traverseFiles = indexOfFile-1;
+    
+    while(files[traverseFiles]) {
+      coordCheck = files[traverseFiles] + ranks;
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseFiles--;
+      i++;
+    }
+
+    
+    while(ranks[traverseRanks]) {
+      coordCheck = files + ranks[traverseRanks];
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseRanks++;
+      i++;
+    }
+
+    traverseRanks = indexOfRank-1;
+    
+    while(files[traverseFiles]) {
+      coordCheck = files + ranks[traverseRanks];
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseRanks--;
+      i++;
+    }
+
+    return piecesFound;
+  }
+
+  knightPath(coordinate, colorInCheck) {
+    const file = coordinate.substring(0, 1);
+    const rank = coordinate.substring(1);
+    let potentialKnights = [];
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    const indexOfFile = files.indexOf(file);
+    const indexOfRank = ranks.indexOf(rank);
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+
+    potentialKnights[0] = '' + files[indexOfFile+1] + ranks[indexOfRank+2];
+    potentialKnights[1] = '' + files[indexOfFile+1] + ranks[indexOfRank-2];
+    potentialKnights[2] = '' + files[indexOfFile-1] + ranks[indexOfRank+2];
+    potentialKnights[3] = '' + files[indexOfFile-1] + ranks[indexOfRank-2];
+    potentialKnights[4] = '' + files[indexOfFile+2] + ranks[indexOfRank+1];
+    potentialKnights[5] = '' + files[indexOfFile+2] + ranks[indexOfRank-1];
+    potentialKnights[6] = '' + files[indexOfFile-2] + ranks[indexOfRank+1];
+    potentialKnights[7] = '' + files[indexOfFile-2] + ranks[indexOfRank-1];
+
+    potentialKnights = potentialKnights.filter(element => !element.includes('undefined'));
+    let piecesFound = [];
+    let squareChecked;
+
+    potentialKnights.forEach(element => {
+      squareChecked = boardMap.get(element);
+      if(squareChecked.piece === 'N' && squareChecked.color !== colorInCheck) {
+        piecesFound.unshift(squareChecked);
+      }
+    });
+
+    return piecesFound;
+  }
+
+  pawnPath(coordinate, colorInCheck) {
+    const file = coordinate.substring(0, 1);
+    const rank = coordinate.substring(1);
+
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    const indexOfFile = files.indexOf(file);
+    const indexOfRank = ranks.indexOf(rank);
+
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+
+    let piecesFound;
+    let squareChecked;
+
+    if(colorInCheck === 'black') {
+      let potentialWhitePawns = [];
+      potentialWhitePawns[0] = '' + files[indexOfFile+1] + ranks[indexOfRank-1];
+      potentialWhitePawns[1] = '' + files[indexOfFile-1] + ranks[indexOfRank-1];
+      potentialWhitePawns = potentialWhitePawns.filter(element => !element.includes('undefined'));
+      
+      potentialWhitePawns.forEach(element => {
+        squareChecked = boardMap.get(element);
+        if(squareChecked.piece === 'P' && squareChecked.color !== colorInCheck) {
+          piecesFound.unshift(squareChecked);
+        }
+      });
+    
+      return piecesFound;
+    }
+
+    if(colorInCheck === 'white') {
+      let potentialBlackPawns = [];
+      potentialBlackPawns[0] = '' + files[indexOfFile+1] + ranks[indexOfRank-1];
+      potentialBlackPawns[1] = '' + files[indexOfFile-1] + ranks[indexOfRank-1];
+      potentialBlackPawns = potentialBlackPawns.filter(element => !element.includes('undefined'));
+      
+      potentialBlackPawns.forEach(element => {
+        squareChecked = boardMap.get(element);
+        if(squareChecked.piece === 'P' && squareChecked.color !== colorInCheck) {
+          piecesFound.unshift(squareChecked);
+        }
+      });
+      return piecesFound;
+    }
+  }
+
+  bishopPath(coordinate, colorInCheck) {
+    const file = coordinate.substring(0, 1);
+    const rank = coordinate.substring(1);
+
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    const indexOfFile = files.indexOf(file);
+    const indexOfRank = ranks.indexOf(rank);
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+    
+    let traverseFiles = indexOfFile+1;
+    let traverseRanks = indexOfRank+1;
+    let piecesFound = [];
+    let squareChecked;
+    let coordCheck;
+    let i = 0;
+
+    while(files[traverseFiles] && ranks[traverseRanks]) {
+      coordCheck = files[traverseFiles] + ranks[traverseRanks];
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseFiles++;
+      traverseRanks++;
+      i++;
+    }
+
+    traverseFiles = indexOfFile-1;
+    traverseRanks = indexOfRank-1;
+
+    while(files[traverseFiles] && ranks[traverseRanks]) {
+      coordCheck = files[traverseFiles] + ranks[traverseRanks];
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseFiles--;
+      traverseRanks--;
+      i++;
+    }
+
+    traverseFiles = indexOfFile+1;
+    traverseRanks = indexOfRank-1;
+
+    while(files[traverseFiles] && ranks[traverseRanks]) {
+      coordCheck = files[traverseFiles] + ranks[traverseRanks];
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseFiles++;
+      traverseRanks--;
+      i++;
+    }
+
+    traverseFiles = indexOfFile-1;
+    traverseRanks = indexOfRank+1;
+
+    while(files[traverseFiles] && ranks[traverseRanks]) {
+      coordCheck = files[traverseFiles] + ranks[traverseRanks];
+      squareChecked = boardMap.get(coordCheck);
+
+      if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
+        piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck};
+        break;
+      }
+
+      traverseFiles--;
+      traverseRanks++;
+      i++;
+    }
+
+    return piecesFound;
+  }
+
   isCheck(board) {
     const boardMap = board;
     const whiteToMove = this.state.whiteToMove;
     const color = whiteToMove ? 'white' : 'black';
-    const coordinate = this.findKing('K', color, boardMap);
+    const coordinate = this.findKing(color, boardMap);
 
     const king = new King({
       board: boardMap,
@@ -248,12 +566,12 @@ class Game extends React.Component {
     
   }
 
-  findKing(piece, color, board) {
+  findKing(color, board) {
     const boardMap = board;
     let coordinate;
 
     boardMap.forEach((value, key) => {
-      if(value.piece === piece && value.color === color) {
+      if(value.piece === 'K' && value.color === color) {
         coordinate = key;
       }
     });

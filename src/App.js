@@ -210,19 +210,28 @@ class Game extends React.Component {
     }
 
     let legalMoves; 
+    const isCheck = this.isCheck(boardMap, whiteToMove);
 
-    if(this.isCheck(boardMap)) {
+    if(isCheck && selectedPiece.pieceObj.piece === 'K'){
+      legalMoves = selectedPiece.pieceObj.legalMoves;
+      this.setState({
+        check: null,
+        sourcesOfCheck: null
+      });
+    }
+    else if(isCheck) {
       const kingCoordinate = this.findKing(colorOfTurn, boardMap);
       const sourcesOfCheck = this.sourcesOfCheck(kingCoordinate, colorOfTurn);
-
+      
       this.setState({
         check: colorOfTurn,
         sourcesOfCheck: sourcesOfCheck
       });
 
-      legalMoves = this.getInCheckLegalMoves(boardMap);
+      legalMoves = this.getInCheckLegalMoves(boardMap, sourcesOfCheck);
 
-    } else {
+    } 
+    else{
       legalMoves = selectedPiece.pieceObj.legalMoves;
       this.setState({
         check: null,
@@ -230,6 +239,8 @@ class Game extends React.Component {
       });
     }
     
+    console.log(legalMoves);
+    console.log(coordinate);
     if(legalMoves.includes(coordinate)) {
       console.log("coordinateMatches");
       this.movePiece(coordinate);
@@ -254,13 +265,14 @@ class Game extends React.Component {
   //   //TODO
   // }
 
-  getInCheckLegalMoves(board) {
+  getInCheckLegalMoves(board, checkSources) {
     const whiteToMove = this.state.whiteToMove;
-    const turnColor = whiteToMove ? 'white': 'black'
-    const sourcesOfCheck = this.state.sourcesOfCheck;
+    const turnColor = whiteToMove ? 'white': 'black';
+    const sourcesOfCheck = checkSources;
     const eliminateSourceOfCheckMove = [];
+    const boardMap = board;
     let captureAndBlockingMoves = [];
-    const coordinate = this.findKing(color, boardMap);
+    const coordinate = this.findKing(turnColor, boardMap);
 
     if(sourcesOfCheck.length === 1) {
       eliminateSourceOfCheckMove.unshift(sourcesOfCheck[0].coordinate); 
@@ -290,9 +302,9 @@ class Game extends React.Component {
       .concat(this.knightPath(kingCoordinate, colorInCheck)
         .concat(this.pawnPath(kingCoordinate, colorInCheck))
       )
-    );
+    ).filter(element => element);
 
-    // this.state.setState({
+    // this.setState({
     //   sourcesOfCheck: sourcesOfCheck
     // });
     
@@ -322,8 +334,10 @@ class Game extends React.Component {
     let i = 0;
 
     while(files[traverseFiles]) {
-      coordCheck = files[traverseFiles] + ranks;
+      coordCheck = files[traverseFiles] + rank;
       squareChecked = boardMap.get(coordCheck);
+      console.log(squareChecked);
+      console.log(coordCheck);
       path[pathIncrement] = coordCheck;
 
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
@@ -341,7 +355,7 @@ class Game extends React.Component {
     traverseFiles = indexOfFile-1;
     
     while(files[traverseFiles]) {
-      coordCheck = files[traverseFiles] + ranks;
+      coordCheck = files[traverseFiles] + rank;
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
@@ -358,7 +372,7 @@ class Game extends React.Component {
     pathIncrement = 0;
     path = [];
     while(ranks[traverseRanks]) {
-      coordCheck = files + ranks[traverseRanks];
+      coordCheck = file + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
@@ -377,7 +391,7 @@ class Game extends React.Component {
     traverseRanks = indexOfRank-1;
     
     while(files[traverseFiles]) {
-      coordCheck = files + ranks[traverseRanks];
+      coordCheck = file + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
@@ -580,9 +594,9 @@ class Game extends React.Component {
     return piecesFound;
   }
 
-  isCheck(board) {
+  isCheck(board, whitesMove) {
     const boardMap = board;
-    const whiteToMove = this.state.whiteToMove;
+    const whiteToMove = whitesMove;
     const color = whiteToMove ? 'white' : 'black';
     const coordinate = this.findKing(color, boardMap);
 
@@ -627,6 +641,7 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
+    const whiteToMove = this.state.whiteToMove;
 
     if(color === 'white') {
       boardMap.set('g1', {piece: 'K', color: 'white', moved: true});
@@ -634,7 +649,7 @@ class Game extends React.Component {
       boardMap.set('e1', {piece: '', color: ''});
       boardMap.set('h1', {piece: '', color: ''});
       console.log()
-      if(this.isCheck(boardMap)) {
+      if(this.isCheck(boardMap, whiteToMove)) {
         return false;
       }
 
@@ -656,7 +671,7 @@ class Game extends React.Component {
       boardMap.set('e8', {piece: '', color: ''});
       boardMap.set('h8', {piece: '', color: ''});
 
-      if(this.isCheck(boardMap)) {
+      if(this.isCheck(boardMap, whiteToMove)) {
         return false;
       }
 
@@ -676,6 +691,7 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
+    const whiteToMove = this.state.whiteToMove;
 
     if(color === 'white') {
       boardMap.set('c1', {piece: 'K', color: 'white', moved: true});
@@ -683,7 +699,7 @@ class Game extends React.Component {
       boardMap.set('e1', {piece: '', color: ''});
       boardMap.set('a1', {piece: '', color: ''});
 
-      if(this.isCheck(boardMap)) {
+      if(this.isCheck(boardMap, whiteToMove)) {
         return false;
       }
 
@@ -704,7 +720,7 @@ class Game extends React.Component {
       boardMap.set('e8', {piece: '', color: ''});
       boardMap.set('a8', {piece: '', color: ''});
 
-      if(this.isCheck(boardMap)) {
+      if(this.isCheck(boardMap, whiteToMove)) {
         return false;
       }
 
@@ -777,28 +793,32 @@ class Game extends React.Component {
   }
 
   movePiece(coordinate) {
+    console.log('movePiece()');
+
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
     const selectedPiece = this.state.selectedPiece;
-
+    const whiteToMove = this.state.whiteToMove;
     if(selectedPiece.pieceObj.piece === 'K' && !selectedPiece.pieceObj.moved) {
-      this.isCastle(selectedPiece, coordinate);
-      return;
+      if(this.isCastle(selectedPiece, coordinate)) {
+        return;
+      }
     }
 
     const boardMapCopy = new Map(Array.from(boardMap));
     boardMapCopy.set(coordinate, this.state.selectedPiece.pieceObj);
     boardMapCopy.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
 
-    if(this.isCheck(boardMapCopy)) {
+    if(this.isCheck(boardMapCopy, whiteToMove)) {
+      console.log('isCheckIf');
       this.unselect();
       return;
     }
-
+    
     boardMap.set(coordinate, this.state.selectedPiece.pieceObj);
     boardMap.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
-
+    console.log(boardMap);
     this.setState({
       history: history.concat([
         {

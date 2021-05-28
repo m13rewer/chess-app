@@ -297,6 +297,7 @@ class Game extends React.Component {
   }
 
   sourcesOfCheck(kingCoordinate, colorInCheck) {
+    console.log('sourcesOfCheck()');
     const sourcesOfCheck = this.rookPath(kingCoordinate, colorInCheck)
     .concat(this.bishopPath(kingCoordinate, colorInCheck)
       .concat(this.knightPath(kingCoordinate, colorInCheck)
@@ -340,6 +341,7 @@ class Game extends React.Component {
       console.log(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -359,6 +361,7 @@ class Game extends React.Component {
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -376,6 +379,7 @@ class Game extends React.Component {
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -390,11 +394,14 @@ class Game extends React.Component {
     path = [];
     traverseRanks = indexOfRank-1;
     
-    while(files[traverseFiles]) {
+    while(ranks[traverseRanks]) {
+      console.log(coordCheck);
       coordCheck = file + ranks[traverseRanks];
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      console.log(squareChecked);
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'R' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -494,7 +501,6 @@ class Game extends React.Component {
   bishopPath(coordinate, colorInCheck) {
     const file = coordinate.substring(0, 1);
     const rank = coordinate.substring(1);
-
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
     const indexOfFile = files.indexOf(file);
@@ -517,6 +523,7 @@ class Game extends React.Component {
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -538,6 +545,7 @@ class Game extends React.Component {
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -559,6 +567,7 @@ class Game extends React.Component {
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -580,6 +589,7 @@ class Game extends React.Component {
       squareChecked = boardMap.get(coordCheck);
       path[pathIncrement] = coordCheck;
 
+      if(squareChecked.piece && squareChecked.color === colorInCheck) break;
       if((squareChecked.piece === 'B' || squareChecked.piece === 'Q') && squareChecked.color !== colorInCheck) {
         piecesFound[i] = {pieceObj: squareChecked, coordinate: coordCheck, path: path};
         break;
@@ -591,6 +601,7 @@ class Game extends React.Component {
       pathIncrement++;
     }
 
+    console.log(piecesFound);
     return piecesFound;
   }
 
@@ -793,8 +804,6 @@ class Game extends React.Component {
   }
 
   movePiece(coordinate) {
-    console.log('movePiece()');
-
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
@@ -811,7 +820,6 @@ class Game extends React.Component {
     boardMapCopy.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
 
     if(this.isCheck(boardMapCopy, whiteToMove)) {
-      console.log('isCheckIf');
       this.unselect();
       return;
     }

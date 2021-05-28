@@ -387,7 +387,7 @@ class Pawn extends React.Component {
   
       traverseRanks = indexOfRank-1;
       i = 0;
-      while(files[traverseFiles]) {
+      while(ranks[traverseRanks]) {
         vectorFour[i] = file + ranks[traverseRanks];
         traverseRanks--;
         i++;
@@ -529,7 +529,7 @@ class Pawn extends React.Component {
   
       traverseRanks = indexOfRank-1;
       i = 0;
-      while(files[traverseFiles]) {
+      while(ranks[traverseRanks]) {
         vectorEight[i] = file + ranks[traverseRanks];
         traverseRanks--;
         i++;

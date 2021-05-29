@@ -10,10 +10,11 @@ class Square extends React.Component {
     const color = pieceObj.color;
     const pieceName = pieceObj.piece;
     const moved = pieceObj.moved;
+    const enPassant = pieceObj.enPassant;
     
     const pieceMap = 
       new Map([
-        ['P', <Pawn board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
+        ['P', <Pawn board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} enPassant={enPassant} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['N', <Knight board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['B', <Bishop board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['R', <Rook board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
@@ -102,10 +103,10 @@ class Game extends React.Component {
               ['a8', {piece: 'R', color: 'black', moved: false}], ['b8', {piece: 'N', color: 'black'}], ['c8', {piece: 'B', color: 'black'}], 
                 ['d8', {piece: 'Q', color: 'black'}], ['e8', {piece: 'K', color: 'black', moved: false}], ['f8', {piece: 'B', color: 'black'}], 
                 ['g8', {piece: 'N', color: 'black'}], ['h8', {piece: 'R', color: 'black', moved: false}],
-              ['a7', {piece: 'P', color: 'black', moved: false}], ['b7', {piece: 'P', color: 'black', moved: false}], 
-                ['c7', {piece: 'P', color: 'black', moved: false}], ['d7', {piece: 'P', color: 'black', moved: false}], 
-                ['e7', {piece: 'P', color: 'black', moved: false}], ['f7', {piece: 'P', color: 'black', moved: false}], 
-                ['g7', {piece: 'P', color: 'black', moved: false}], ['h7', {piece: 'P', color: 'black', moved: false}],
+              ['a7', {piece: 'P', color: 'black', moved: false, enPassant: false}], ['b7', {piece: 'P', color: 'black', moved: false, enPassant: false}], 
+                ['c7', {piece: 'P', color: 'black', moved: false, enPassant: false}], ['d7', {piece: 'P', color: 'black', moved: false, enPassant: false}], 
+                ['e7', {piece: 'P', color: 'black', moved: false, enPassant: false}], ['f7', {piece: 'P', color: 'black', moved: false, enPassant: false}], 
+                ['g7', {piece: 'P', color: 'black', moved: false, enPassant: false}], ['h7', {piece: 'P', color: 'black', moved: false, enPassant: false}],
               ['a6', {piece: '', color: ''}], ['b6', {piece: '', color: ''}], ['c6', {piece: '', color: ''}], ['d6',{piece: '', color: ''}], 
                 ['e6', {piece: '', color: ''}], ['f6', {piece: '', color: ''}], ['g6', {piece: '', color: ''}], ['h6', {piece: '', color: ''}],
               ['a5', {piece: '', color: ''}], ['b5', {piece: '', color: ''}], ['c5', {piece: '', color: ''}], ['d5',{piece: '', color: ''}], 
@@ -114,10 +115,10 @@ class Game extends React.Component {
                 ['e4', {piece: '', color: ''}], ['f4', {piece: '', color: ''}], ['g4', {piece: '', color: ''}], ['h4', {piece: '', color: ''}],
               ['a3', {piece: '', color: ''}], ['b3', {piece: '', color: ''}], ['c3', {piece: '', color: ''}], ['d3',{piece: '', color: ''}], 
                 ['e3', {piece: '', color: ''}], ['f3', {piece: '', color: ''}], ['g3', {piece: '', color: ''}], ['h3', {piece: '', color: ''}],
-              ['a2', {piece: 'P', color: 'white', moved: false}], ['b2', {piece: 'P', color: 'white', moved: false}], 
-                ['c2', {piece: 'P', color: 'white', moved: false}], ['d2', {piece: 'P', color: 'white', moved: false}], 
-                ['e2', {piece: 'P', color: 'white', moved: false}], ['f2', {piece: 'P', color: 'white', moved: false}], 
-                ['g2', {piece: 'P', color: 'white', moved: false}], ['h2', {piece: 'P', color: 'white', moved: false}],
+              ['a2', {piece: 'P', color: 'white', moved: false, enPassant: false}], ['b2', {piece: 'P', color: 'white', moved: false, enPassant: false}], 
+                ['c2', {piece: 'P', color: 'white', moved: false, enPassant: false}], ['d2', {piece: 'P', color: 'white', moved: false, enPassant: false}], 
+                ['e2', {piece: 'P', color: 'white', moved: false, enPassant: false}], ['f2', {piece: 'P', color: 'white', moved: false, enPassant: false}], 
+                ['g2', {piece: 'P', color: 'white', moved: false, enPassant: false}], ['h2', {piece: 'P', color: 'white', moved: false, enPassant: false}],
               ['a1', {piece: 'R', color: 'white', moved: false}], ['b1', {piece: 'N', color: 'white'}], ['c1', {piece: 'B', color: 'white'}], 
                 ['d1', {piece: 'Q', color: 'white'}], ['e1', {piece: 'K', color: 'white', moved: false}], ['f1', {piece: 'B', color: 'white'}], 
                 ['g1', {piece: 'N', color: 'white'}], ['h1', {piece: 'R', color: 'white', moved: false}]
@@ -272,15 +273,7 @@ class Game extends React.Component {
       captureAndBlockingMoves = eliminateSourceOfCheckMove.concat(sourcesOfCheck[0].path);
     }
 
-    // const king = new King({
-    //   board: boardMap,
-    //   color: turnColor,
-    //   moved: false,
-    //   coordinate: coordinate
-    // });
-
-    //const legalKingMoves = king.getLegalMoves(king.calculatePotentialMoves(coordinate));
-    const inCheckLegalMoves = captureAndBlockingMoves;//.concat(legalKingMoves);
+    const inCheckLegalMoves = captureAndBlockingMoves;
 
     return inCheckLegalMoves;
   }
@@ -297,10 +290,6 @@ class Game extends React.Component {
         .concat(this.pawnPath(kingCoordinate, colorInCheck))
       )
     ).filter(element => element);
-
-    // this.setState({
-    //   sourcesOfCheck: sourcesOfCheck
-    // });
     
     return sourcesOfCheck;
   }
@@ -744,9 +733,66 @@ class Game extends React.Component {
 
   }
 
+  canEnPassant(coordinate) {
+    console.log('canEnPassant');
+    //const color = !this.state.whiteToMove ? 'white': 'black';
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+    //const selectedPiece = this.state.selectedPiece;
+
+    const file = coordinate.substring(0, 1);
+    const rank = coordinate.substring(1);
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    //const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
+    const indexOfFile = files.indexOf(file);
+    
+    const potentialPawnsEnPassant = [];
+    const squareOne = ''+files[indexOfFile+1] + rank;
+    const squareTwo = ''+files[indexOfFile-1] + rank;
+    
+    if(!squareOne.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareOne, pieceObj: boardMap.get(squareOne)});
+    if(!squareTwo.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareTwo, pieceObj: boardMap.get(squareTwo)});
+    console.log(potentialPawnsEnPassant);
+    const pawnsEnPassant = potentialPawnsEnPassant.filter(element => element.pieceObj.piece === 'P');
+
+    return pawnsEnPassant;
+
+  }
+
+  isBigPawnPush(coordinate) {
+    console.log('isBigPawnPush()');
+    const selectedPiece = this.state.selectedPiece;
+    const selectedPieceCoordinate = selectedPiece.coordinate;
+    //const file = coordinate.substring(0, 1);
+    const rank = Number.parseInt(coordinate.substring(1));
+    const selectedPieceRank = Number.parseInt(selectedPieceCoordinate.substring(1));
+    console.log(coordinate);
+    console.log(selectedPieceCoordinate);
+    if(Math.abs(rank - selectedPieceRank) === 2) return true;
+    return false;
+
+  }
+  isEnPassant() {
+
+  }
   enPassant() {
 
   }
+  // giveEnPassant(pawns) {
+  //   const history = this.state.history.slice(0, 1);
+  //   const current = history[history.length - 1];
+  //   const boardMap = current.board;
+  //   const enPassantPawns = pawns;
+    
+  //   enPassantPawns.forEach(element => {
+  //     element.pieceObj.enPassant = true;
+  //     boardMap.set(element.coordinate, element.pieceObj);
+  //     //element.pieceObj.coordinate
+  //   });
+
+  //   return boardMap;
+  // }
 
   getPieceInstance(pieceObj, coordinate) {
     const history = this.state.history.slice(0, 1);
@@ -825,6 +871,18 @@ class Game extends React.Component {
     boardMap.set(coordinate, selectedPiece.pieceObj);
     boardMap.set(selectedPiece.coordinate, {piece: '', color: ''});
     console.log(boardMap);
+    console.log(selectedPiece.pieceObj);
+    if(selectedPiece.pieceObj.piece === 'P' && this.isBigPawnPush(coordinate)) {
+      const enPassantPawns = this.canEnPassant(coordinate);
+      console.log(enPassantPawns);
+      if(enPassantPawns.length > 0) {
+        enPassantPawns.forEach(element => {
+          element.pieceObj.enPassant = true;
+          boardMap.set(element.coordinate, element.pieceObj);
+        });
+      }
+    }
+
     this.setState({
       history: history.concat([
         {

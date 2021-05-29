@@ -144,7 +144,7 @@ class Pawn extends React.Component {
       console.log(legalMoves);
       this.props.onClick(this.props.coordinate, 
         {
-          piece: 'P', color: this.props.color, legalMoves: legalMoves
+          piece: 'P', color: this.props.color, legalMoves: legalMoves, moved: this.props.moved, enPassant: this.props.enPassant
         });
     }
   

@@ -150,33 +150,13 @@ class Game extends React.Component {
 
   pieceSelection(coordinate, pieceObj) {
     console.log("pieceSelection")
-    if(!this.state.selectedPiece && !pieceObj) {
-      return true;
-    }
-
-    if(!this.state.selectedPiece && pieceObj.piece) {
-      this.setState(
-        {
-          selectedPiece: {coordinate: coordinate, pieceObj: pieceObj}
-        }
-      );
-
-      return true;
-    }
-
-    if(this.state.selectedPiece && !pieceObj) return false;
-
-    if(this.state.selectedPiece && pieceObj.piece && this.state.selectedPiece.color && pieceObj.piece.color) {
-      this.setState(
-        {
-          selectedPiece: {coordinate: coordinate, pieceObj: pieceObj}
-        }
-      );
-
-      return true;
-    }
-
-    return false;
+    
+    this.setState(
+      {
+        selectedPiece: {coordinate: coordinate, pieceObj: pieceObj}
+      }
+    );
+      
   }
 
   unselect() {
@@ -199,10 +179,18 @@ class Game extends React.Component {
     const colorOfTurn = whiteToMove ? 'white': 'black';
     
     //const historyLength = this.state.history.length;
-
-    if(this.pieceSelection(coordinate, pieceObj)) return;
-
+    
     const selectedPiece = this.state.selectedPiece;
+
+    if(!selectedPiece) {
+      this.pieceSelection(coordinate, pieceObj);
+      return;
+    }
+
+    if(selectedPiece && !selectedPiece.pieceObj.legalMoves.includes(coordinate)) {
+      this.pieceSelection(coordinate, pieceObj);
+      return;
+    }
 
     if(selectedPiece.pieceObj.color !== player.color) {
       this.unselect();
@@ -219,7 +207,7 @@ class Game extends React.Component {
         sourcesOfCheck: null
       });
     }
-    else if(isCheck) {
+    else if(isCheck && selectedPiece.pieceObj.piece !== 'K') {
       const kingCoordinate = this.findKing(colorOfTurn, boardMap);
       const sourcesOfCheck = this.sourcesOfCheck(kingCoordinate, colorOfTurn);
       
@@ -229,7 +217,12 @@ class Game extends React.Component {
       });
 
       legalMoves = this.getInCheckLegalMoves(boardMap, sourcesOfCheck);
+      legalMoves = selectedPiece.pieceObj.legalMoves.filter(element => legalMoves.includes(element));
 
+      if(legalMoves.length === 0) {
+        this.unselect();
+        return;
+      }
     } 
     else{
       legalMoves = selectedPiece.pieceObj.legalMoves;
@@ -243,7 +236,7 @@ class Game extends React.Component {
     console.log(coordinate);
     if(legalMoves.includes(coordinate)) {
       console.log("coordinateMatches");
-      this.movePiece(coordinate);
+      if(!this.movePiece(coordinate)) return;
       this.switchTurns();
 
       return;
@@ -279,15 +272,15 @@ class Game extends React.Component {
       captureAndBlockingMoves = eliminateSourceOfCheckMove.concat(sourcesOfCheck[0].path);
     }
 
-    const king = new King({
-      board: boardMap,
-      color: turnColor,
-      moved: false,
-      coordinate: coordinate
-    });
+    // const king = new King({
+    //   board: boardMap,
+    //   color: turnColor,
+    //   moved: false,
+    //   coordinate: coordinate
+    // });
 
-    const legalKingMoves = king.getLegalMoves(king.calculatePotentialMoves(coordinate));
-    const inCheckLegalMoves = captureAndBlockingMoves.concat(legalKingMoves);
+    //const legalKingMoves = king.getLegalMoves(king.calculatePotentialMoves(coordinate));
+    const inCheckLegalMoves = captureAndBlockingMoves;//.concat(legalKingMoves);
 
     return inCheckLegalMoves;
   }
@@ -809,23 +802,28 @@ class Game extends React.Component {
     const boardMap = current.board;
     const selectedPiece = this.state.selectedPiece;
     const whiteToMove = this.state.whiteToMove;
+
     if(selectedPiece.pieceObj.piece === 'K' && !selectedPiece.pieceObj.moved) {
       if(this.isCastle(selectedPiece, coordinate)) {
-        return;
+        return true;
       }
     }
 
     const boardMapCopy = new Map(Array.from(boardMap));
-    boardMapCopy.set(coordinate, this.state.selectedPiece.pieceObj);
-    boardMapCopy.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
+    boardMapCopy.set(coordinate, selectedPiece.pieceObj);
+    boardMapCopy.set(selectedPiece.coordinate, {piece: '', color: ''});
 
     if(this.isCheck(boardMapCopy, whiteToMove)) {
       this.unselect();
-      return;
+      return false;
+    }
+
+    if(selectedPiece.pieceObj.piece === 'K' || selectedPiece.pieceObj.piece === 'R' || selectedPiece.pieceObj.piece === 'P') {
+      selectedPiece.pieceObj.moved = true;
     }
     
-    boardMap.set(coordinate, this.state.selectedPiece.pieceObj);
-    boardMap.set(this.state.selectedPiece.coordinate, {piece: '', color: ''});
+    boardMap.set(coordinate, selectedPiece.pieceObj);
+    boardMap.set(selectedPiece.coordinate, {piece: '', color: ''});
     console.log(boardMap);
     this.setState({
       history: history.concat([
@@ -837,6 +835,7 @@ class Game extends React.Component {
     });
 
     console.log(boardMap);
+    return true;
   }
 
   render() {

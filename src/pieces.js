@@ -71,7 +71,7 @@ class Pawn extends React.Component {
           }
   
           if(potentialMoves[i] === file + (Number.parseInt(rank)+1) && pieceObj.piece) {
-            return;
+            return legalMoves;
           }
   
           if(potentialMoves[i] === file + (Number.parseInt(rank)+1) && !pieceObj.piece) {
@@ -94,7 +94,7 @@ class Pawn extends React.Component {
           }
   
           if(potentialMoves[i] === file + (Number.parseInt(rank)-1) && pieceObj.piece) {
-            return;
+            return legalMoves;
           }
   
           if(potentialMoves[i] === file + (Number.parseInt(rank)-1) && !pieceObj.piece) {
@@ -141,6 +141,7 @@ class Pawn extends React.Component {
     handleClick(){
       console.log("handlePawnClick")
       const legalMoves = this.getLegalMoves(this.props.coordinate, this.calculatePotentialMoves(this.props.coordinate));
+      console.log(legalMoves);
       this.props.onClick(this.props.coordinate, 
         {
           piece: 'P', color: this.props.color, legalMoves: legalMoves

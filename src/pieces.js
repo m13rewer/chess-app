@@ -82,6 +82,12 @@ class Pawn extends React.Component {
             legalMoves[i] = potentialMoves[i];
           }
         }
+        const enPassant = this.props.enPassant;
+        const enPassantFile = enPassant.substring(0, 1);
+        const enPassantRank =  Number.parseInt(enPassant.substring(1));
+        const captureSquare = enPassantFile + (enPassantRank+1);
+
+        if(this.props.enPassant) legalMoves.push(captureSquare);
       }
 
       if(this.props.color === 'black') {
@@ -105,6 +111,14 @@ class Pawn extends React.Component {
             legalMoves[i] = potentialMoves[i];
           }
         }
+        const enPassant = this.props.enPassant;
+        const enPassantFile = enPassant.substring(0, 1);
+        const enPassantRank =  Number.parseInt(enPassant.substring(1));
+        const captureSquare = enPassantFile + (enPassantRank-1);
+
+        if(this.props.enPassant) legalMoves.push(captureSquare);
+  
+        
       } 
 
       return legalMoves.filter(element => element);

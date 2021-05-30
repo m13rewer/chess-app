@@ -178,9 +178,6 @@ class Game extends React.Component {
     const boardMap = current.board;
     const whiteToMove = this.state.whiteToMove;
     const colorOfTurn = whiteToMove ? 'white': 'black';
-    
-    //const historyLength = this.state.history.length;
-    
     const selectedPiece = this.state.selectedPiece;
 
     if(!selectedPiece) {
@@ -233,8 +230,6 @@ class Game extends React.Component {
       });
     }
     
-    console.log(legalMoves);
-    console.log(coordinate);
     if(legalMoves.includes(coordinate)) {
       console.log("coordinateMatches");
       if(!this.movePiece(coordinate)) return;
@@ -255,18 +250,11 @@ class Game extends React.Component {
     });
 
   }
-  // findBlockingMove() {
-  //   //TODO
-  // }
 
-  getInCheckLegalMoves(board, checkSources) {
-    const whiteToMove = this.state.whiteToMove;
-    const turnColor = whiteToMove ? 'white': 'black';
+  getInCheckLegalMoves(checkSources) {
     const sourcesOfCheck = checkSources;
     const eliminateSourceOfCheckMove = [];
-    const boardMap = board;
     let captureAndBlockingMoves = [];
-    const coordinate = this.findKing(turnColor, boardMap);
 
     if(sourcesOfCheck.length === 1) {
       eliminateSourceOfCheckMove.unshift(sourcesOfCheck[0].coordinate); 
@@ -734,17 +722,12 @@ class Game extends React.Component {
   }
 
   canEnPassant(coordinate) {
-    console.log('canEnPassant');
-    //const color = !this.state.whiteToMove ? 'white': 'black';
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
-    //const selectedPiece = this.state.selectedPiece;
-
     const file = coordinate.substring(0, 1);
     const rank = coordinate.substring(1);
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    //const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'];
     const indexOfFile = files.indexOf(file);
     
     const potentialPawnsEnPassant = [];
@@ -753,7 +736,7 @@ class Game extends React.Component {
     
     if(!squareOne.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareOne, pieceObj: boardMap.get(squareOne)});
     if(!squareTwo.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareTwo, pieceObj: boardMap.get(squareTwo)});
-    console.log(potentialPawnsEnPassant);
+    
     const pawnsEnPassant = potentialPawnsEnPassant.filter(element => element.pieceObj.piece === 'P');
 
     return pawnsEnPassant;
@@ -761,38 +744,38 @@ class Game extends React.Component {
   }
 
   isBigPawnPush(coordinate) {
-    console.log('isBigPawnPush()');
     const selectedPiece = this.state.selectedPiece;
     const selectedPieceCoordinate = selectedPiece.coordinate;
-    //const file = coordinate.substring(0, 1);
     const rank = Number.parseInt(coordinate.substring(1));
     const selectedPieceRank = Number.parseInt(selectedPieceCoordinate.substring(1));
-    console.log(coordinate);
-    console.log(selectedPieceCoordinate);
+    
     if(Math.abs(rank - selectedPieceRank) === 2) return true;
     return false;
 
   }
-  isEnPassant() {
 
+  isEnPassant(coordinate) {
+    console.log('isEnPassant()');
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+    console.log(boardMap.get(coordinate));
+    if(!boardMap.get(coordinate).piece) {
+      console.log(true);
+      return true;
+    }
+
+    return false;
   }
-  enPassant() {
 
+  isPawnCapture(coordinate) {
+    console.log('isPawnCapture()');
+    const file = coordinate.substring(0, 1);
+    const selectedPieceFile = this.state.selectedPiece.coordinate.substring(0, 1);
+
+    if(file !== selectedPieceFile) return true;
+    return false;
   }
-  // giveEnPassant(pawns) {
-  //   const history = this.state.history.slice(0, 1);
-  //   const current = history[history.length - 1];
-  //   const boardMap = current.board;
-  //   const enPassantPawns = pawns;
-    
-  //   enPassantPawns.forEach(element => {
-  //     element.pieceObj.enPassant = true;
-  //     boardMap.set(element.coordinate, element.pieceObj);
-  //     //element.pieceObj.coordinate
-  //   });
-
-  //   return boardMap;
-  // }
 
   getPieceInstance(pieceObj, coordinate) {
     const history = this.state.history.slice(0, 1);
@@ -850,9 +833,7 @@ class Game extends React.Component {
     const whiteToMove = this.state.whiteToMove;
 
     if(selectedPiece.pieceObj.piece === 'K' && !selectedPiece.pieceObj.moved) {
-      if(this.isCastle(selectedPiece, coordinate)) {
-        return true;
-      }
+      if(this.isCastle(selectedPiece, coordinate)) return true;
     }
 
     const boardMapCopy = new Map(Array.from(boardMap));
@@ -868,13 +849,25 @@ class Game extends React.Component {
       selectedPiece.pieceObj.moved = true;
     }
     
+    if(selectedPiece.pieceObj.piece === 'P' && this.isPawnCapture(coordinate)) {
+      if(this.isEnPassant(coordinate)) {
+        const file = coordinate.substring(0, 1);
+        const rank = Number.parseInt(coordinate.substring(1));
+        if(selectedPiece.pieceObj.color === 'white') {
+          boardMap.set(file+(rank-1), {piece: '', color: ''});
+        } 
+        if(selectedPiece.pieceObj.color === 'black') {
+          boardMap.set(file+(rank+1), {piece: '', color: ''});
+        }
+      }
+    }
+
     boardMap.set(coordinate, selectedPiece.pieceObj);
     boardMap.set(selectedPiece.coordinate, {piece: '', color: ''});
-    console.log(boardMap);
-    console.log(selectedPiece.pieceObj);
+
     if(selectedPiece.pieceObj.piece === 'P' && this.isBigPawnPush(coordinate)) {
       const enPassantPawns = this.canEnPassant(coordinate);
-      console.log(enPassantPawns);
+      
       if(enPassantPawns.length > 0) {
         enPassantPawns.forEach(element => {
           element.pieceObj.enPassant = coordinate;
@@ -892,7 +885,6 @@ class Game extends React.Component {
       selectedPiece: null
     });
 
-    console.log(boardMap);
     return true;
   }
 

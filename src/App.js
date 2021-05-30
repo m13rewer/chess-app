@@ -858,6 +858,7 @@ class Game extends React.Component {
       if(this.isEnPassant(coordinate)) {
         const file = coordinate.substring(0, 1);
         const rank = Number.parseInt(coordinate.substring(1));
+        selectedPiece.pieceObj.enPassant = '';
         if(selectedPiece.pieceObj.color === 'white') {
           boardMap.set(file+(rank-1), {piece: '', color: ''});
         } 

@@ -190,7 +190,10 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} className={"fas fa-chess-pawn "+this.props.color}></i>
+        <div className="icon-div" onClick={()=>this.handleClick()}>
+          <i className={"fas fa-chess-pawn "+this.props.color}></i>
+        </div>
+        
       );
     }
   }
@@ -254,8 +257,10 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} className={"fas fa-chess-knight "+this.props.color}></i>
-      );
+        <div className="icon-div" onClick={()=>this.handleClick()}>
+          <i className={"fas fa-chess-knight "+this.props.color}></i>
+        </div>      
+        );
     }
   }
   
@@ -360,7 +365,9 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} className={"fas fa-chess-bishop "+this.props.color}></i>
+        <div className="icon-div" onClick={()=>this.handleClick()}>
+          <i className={"fas fa-chess-bishop "+this.props.color}></i>
+        </div>
       );
     }
   }
@@ -452,8 +459,9 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        // <p onClick={()=>this.handleClick()}>R</p>
-        <i onClick={()=>this.handleClick()} className={"fas fa-chess-rook "+this.props.color}></i>
+        <div className="icon-div" onClick={()=>this.handleClick()}>
+          <i className={"fas fa-chess-rook "+this.props.color}></i>
+        </div>
       );
     }
   }
@@ -598,8 +606,9 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        //<p onClick={()=>this.handleClick()}>Q</p>
-        <i onClick={()=>this.handleClick()} className={"fas fa-chess-queen "+this.props.color}></i>
+        <div className="icon-div" onClick={()=>this.handleClick()}>
+          <i className={"fas fa-chess-queen "+this.props.color}></i>
+        </div>
       );
     }
   }
@@ -746,7 +755,9 @@ class Pawn extends React.Component {
   
     render() {
       return (
-        <i onClick={()=>this.handleClick()} className={"fas fa-chess-king "+this.props.color}></i>
+        <div className="icon-div" onClick={()=>this.handleClick()}>
+          <i className={"fas fa-chess-king "+this.props.color}></i>
+        </div>
       );
     }
   }
@@ -760,7 +771,9 @@ class Pawn extends React.Component {
     render() {
       
       return (
-        <p onClick={()=>this.handleClick()}></p>
+        <div className="icon-div" onClick={()=>this.handleClick()}>
+          <p></p>
+        </div>
       );
     }
   }

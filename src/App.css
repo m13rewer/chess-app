@@ -85,6 +85,9 @@ i {
     overflow: visible;
 }
 
+.icon-div {
+    height: 100%;
+}
 .picker {
     position: relative;
     z-index: 1;

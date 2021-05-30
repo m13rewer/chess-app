@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import React from 'react';
-import {Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
+import {PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
 
 class Square extends React.Component {
 
@@ -14,6 +14,7 @@ class Square extends React.Component {
     
     const pieceMap = 
       new Map([
+        ['PP', <PiecePicker board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)} onPromote={(coordinate, pieceObj)=> this.props.onPromote(coordinate, pieceObj)}/>],
         ['P', <Pawn board={this.props.board} color={color} moved={moved} coordinate={this.props.coordinate} enPassant={enPassant} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['N', <Knight board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
         ['B', <Bishop board={this.props.board} color={color} coordinate={this.props.coordinate} onClick={(coordinate, pieceObj)=> this.props.onClick(coordinate, pieceObj)}/>], 
@@ -31,7 +32,7 @@ class Square extends React.Component {
   render() {
     
     return (
-      <div className={this.props.color+"-square square"} id={this.props.coordinate}>
+      <div className={"overflow " +this.props.color+"-square square"} id={this.props.coordinate}>
         {this.renderPiece(this.props.piece)}
       </div>
     );
@@ -48,7 +49,8 @@ class Board extends React.Component {
         coordinate={coordinate} 
         piece={piece}
         board={this.props.board}
-        onClick={(coordinate, pieceObj) => this.props.onClick(coordinate, pieceObj)}/>
+        onClick={(coordinate, pieceObj) => this.props.onClick(coordinate, pieceObj)}
+        onPromote={(coordinate, pieceObj) => this.props.onPromote(coordinate, pieceObj)}/>
     );
   }
 
@@ -248,7 +250,6 @@ class Game extends React.Component {
       whiteToMove: !whiteToMove,
       player: {color: !whiteToMove ? 'white': 'black', isMyTurn: true, status: 'playing'} //this is temporary because we will never change player color during a real game
     });
-
   }
 
   getInCheckLegalMoves(checkSources) {
@@ -433,7 +434,7 @@ class Game extends React.Component {
     const current = history[history.length - 1];
     const boardMap = current.board;
 
-    let piecesFound;
+    let piecesFound = [];
     let squareChecked;
 
     if(colorInCheck === 'black') {
@@ -717,10 +718,6 @@ class Game extends React.Component {
     }
   }
 
-  promote() {
-
-  }
-
   canEnPassant(coordinate) {
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
@@ -825,6 +822,14 @@ class Game extends React.Component {
     }
   }
 
+  promote(coordinate, boardMap) {
+
+  }
+
+  pickPiece() {
+
+  }
+
   movePiece(coordinate) {
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
@@ -875,6 +880,26 @@ class Game extends React.Component {
         });
       }
     }
+    console.log('beforePromtoe');
+    console.log(selectedPiece);
+    console.log(coordinate.substring(1));
+    
+
+    if(selectedPiece.pieceObj.piece === 'P' && (coordinate.substring(1) === '1' || coordinate.substring(1) === '8')) {
+      console.log('promote');
+      //this.promote(coordinate);
+      boardMap.set(coordinate, {piece: 'PP', color: whiteToMove ? 'white': 'black'});
+      this.setState({
+        history: history.concat([
+          {
+            board: boardMap
+          }
+        ]),
+        selectedPiece: null
+      });
+      return false;
+    }
+
 
     this.setState({
       history: history.concat([
@@ -885,7 +910,22 @@ class Game extends React.Component {
       selectedPiece: null
     });
 
+    
     return true;
+  }
+
+  handlePromotion(coordinate, piece) {
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+
+    boardMap.set(coordinate, piece);
+    history[history - 1] = boardMap;
+    this.setState({
+      history: history,
+      selectedPiece: null
+    });
+    this.switchTurns();
   }
 
   render() {
@@ -894,7 +934,9 @@ class Game extends React.Component {
    
     return (
       <div>
-        <Board onClick={(coordinate, piece) => this.handleClick(coordinate, piece)} board={current.board}/>
+        <Board onClick={(coordinate, piece) => this.handleClick(coordinate, piece)} 
+        board={current.board} 
+        onPromote={(coordinate, piece) => this.handlePromotion(coordinate, piece)}/>
         <button onClick={() => this.startGame()}>Create Game</button>
       </div>
     );

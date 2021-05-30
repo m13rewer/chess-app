@@ -45,6 +45,32 @@ export function vectorSquaresHit(potentialVector, props) {
   return vector.filter(element => element);
 }
 
+class PiecePicker extends React.Component {
+  handleClick(pieceObj) {
+    this.props.onPromote(this.props.coordinate, pieceObj);
+  }
+
+  render() {
+    return (
+      <div className="picker">
+        <div>
+          <i onClick={()=>this.handleClick({piece: 'Q', color: this.props.color})} className={"fas fa-chess-queen "+this.props.color}></i>
+        </div>
+        <div>
+          <i onClick={()=>this.handleClick({piece: 'N', color: this.props.color})} className={"fas fa-chess-knight "+this.props.color}></i>
+        </div>
+        <div>
+          <i onClick={()=>this.handleClick({piece: 'R', color: this.props.color})} className={"fas fa-chess-rook "+this.props.color}></i>
+        </div>
+        <div>
+          <i onClick={()=>this.handleClick({piece: 'B', color: this.props.color})} className={"fas fa-chess-bishop "+this.props.color}></i>
+        </div>
+      </div>
+      
+    );
+  }
+}
+
 class Pawn extends React.Component {
     squaresHit(coordinate) {
       const file = coordinate.substring(0, 1);
@@ -739,4 +765,4 @@ class Pawn extends React.Component {
     }
   }
 
-  export {Pawn, Knight, Bishop, Rook, Queen, King, NoPiece};
+  export {PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece};

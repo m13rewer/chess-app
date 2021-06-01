@@ -153,13 +153,13 @@ class Game extends React.Component {
 
   pieceSelection(coordinate, pieceObj) {
     console.log("pieceSelection")
-    
-    this.setState(
-      {
-        selectedPiece: {coordinate: coordinate, pieceObj: pieceObj}
-      }
-    );
-      
+    if(pieceObj.piece) {
+      this.setState(
+        {
+          selectedPiece: {coordinate: coordinate, pieceObj: pieceObj}
+        }
+      );
+    }  
   }
 
   unselect() {

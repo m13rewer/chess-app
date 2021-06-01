@@ -765,7 +765,7 @@ class Pawn extends React.Component {
   class NoPiece extends React.Component {
   
     handleClick() {
-      this.props.onClick(this.props.coordinate, null);
+      this.props.onClick(this.props.coordinate, {piece: '', color: ''});
     }
   
     render() {

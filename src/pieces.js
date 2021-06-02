@@ -615,8 +615,7 @@ class Pawn extends React.Component {
   
   class King extends React.Component {
     squaresHit(coordinate) {
-      //I think i can take out this filter
-      const squaresHit = this.calculatePotentialMoves(coordinate).filter(element => !element.includes('Castle'));
+      const squaresHit = this.calculatePotentialMoves(coordinate);//.filter(element => !element.includes('Castle'));
       return squaresHit;
     }
     getLegalMoves(potentialMoves) {
@@ -735,8 +734,7 @@ class Pawn extends React.Component {
       potentialMoves[5] = '' + files[indexOfFile-1]+ranks[indexOfRank+1];
       potentialMoves[6] = '' + files[indexOfFile+1]+rank;
       potentialMoves[7] = '' + files[indexOfFile-1]+rank;
-      // potentialMoves[8] = 'K-Castle';
-      // potentialMoves[9] = 'Q-Castle';
+  
       potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
       
       console.log(potentialMoves);

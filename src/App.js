@@ -162,6 +162,12 @@ class Game extends React.Component {
     }  
   }
 
+  endGame() {
+    this.setState({
+        gameStatus: 'checkmate'
+    });
+  }
+
   unselect() {
     this.setState(
       {
@@ -199,6 +205,10 @@ class Game extends React.Component {
 
     let legalMoves; 
     const isCheck = this.isCheck(boardMap, whiteToMove);
+
+    if(isCheck && this.isCheckmate()) {
+      this.endGame();
+    }
 
     if(isCheck && selectedPiece.pieceObj.piece === 'K'){
       legalMoves = selectedPiece.pieceObj.legalMoves;
@@ -268,7 +278,29 @@ class Game extends React.Component {
   }
 
   isCheckmate() {
+    const boardMap = board;
+    const whiteToMove = whitesMove;
+    const color = whiteToMove ? 'white' : 'black';
+    const coordinate = this.findKing(color, boardMap);
 
+    const king = new King({
+      board: boardMap,
+      color: color,
+      moved: false,
+      coordinate: coordinate
+    });
+
+    const legalKingMoves = king.getAllSquaresHit(king.calculatePotentialMoves(coordinate));
+    const sourcesOfCheck = this.sourcesOfCheck(kingCoordinate, colorOfTurn);
+      
+    const legalMoves = this.getInCheckLegalMoves(boardMap, sourcesOfCheck).concat(legalKingMoves);
+
+    if(legalMoves.length === 0) {
+      return true;
+    }
+
+    return false;
+    
   }
 
   sourcesOfCheck(kingCoordinate, colorInCheck) {

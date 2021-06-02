@@ -278,8 +278,11 @@ class Game extends React.Component {
   }
 
   isCheckmate() {
-    const boardMap = board;
-    const whiteToMove = whitesMove;
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+    const whiteToMove = this.state.whiteToMove;
+
     const color = whiteToMove ? 'white' : 'black';
     const coordinate = this.findKing(color, boardMap);
 
@@ -291,7 +294,7 @@ class Game extends React.Component {
     });
 
     const legalKingMoves = king.getAllSquaresHit(king.calculatePotentialMoves(coordinate));
-    const sourcesOfCheck = this.sourcesOfCheck(kingCoordinate, colorOfTurn);
+    const sourcesOfCheck = this.sourcesOfCheck(coordinate, color);
       
     const legalMoves = this.getInCheckLegalMoves(boardMap, sourcesOfCheck).concat(legalKingMoves);
 

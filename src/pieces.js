@@ -75,9 +75,7 @@ class Pawn extends React.Component {
     squaresHit(coordinate) {
       const file = coordinate.substring(0, 1);
       const squaresHit = this.calculatePotentialMoves(coordinate).filter(element => !element.includes(file));
-      console.log(file);
-      console.log(this.calculatePotentialMoves(coordinate));
-      console.log(squaresHit);
+      
       return squaresHit;
     }
     getLegalMoves(coordinate, potentialMoves) {
@@ -179,9 +177,7 @@ class Pawn extends React.Component {
     }
   
     handleClick(){
-      console.log("handlePawnClick")
       const legalMoves = this.getLegalMoves(this.props.coordinate, this.calculatePotentialMoves(this.props.coordinate));
-      console.log(legalMoves);
       this.props.onClick(this.props.coordinate, 
         {
           piece: 'P', color: this.props.color, legalMoves: legalMoves, moved: this.props.moved, enPassant: this.props.enPassant
@@ -240,8 +236,6 @@ class Pawn extends React.Component {
       potentialMoves[5] = '' + files[indexOfFile+2] + ranks[indexOfRank-1];
       potentialMoves[6] = '' + files[indexOfFile-2] + ranks[indexOfRank+1];
       potentialMoves[7] = '' + files[indexOfFile-2] + ranks[indexOfRank-1];
-
-      console.log(potentialMoves);
   
       potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
       return potentialMoves;
@@ -274,7 +268,6 @@ class Pawn extends React.Component {
       }
 
       const squaresHit = potentialMoves.filter(element => element.length > 0);
-      console.log(squaresHit);
       return squaresHit;
     }
 
@@ -285,7 +278,6 @@ class Pawn extends React.Component {
         }
 
         const legalMoves = potentialMoves.filter(element => element.length > 0);
-        console.log(legalMoves);
         return legalMoves;
   
     }
@@ -380,7 +372,6 @@ class Pawn extends React.Component {
       }
 
       const squaresHit = potentialMoves.filter(element => element.length > 0);
-      console.log(squaresHit);
       return squaresHit;
     }
     getLegalMoves(potentialMoves) {
@@ -390,7 +381,6 @@ class Pawn extends React.Component {
         }
 
         const legalMoves = potentialMoves.filter(element => element.length > 0);
-        console.log(legalMoves);
         return legalMoves;
     }
   
@@ -474,7 +464,6 @@ class Pawn extends React.Component {
       }
 
       const squaresHit = potentialMoves.filter(element => element.length > 0);
-      console.log(squaresHit);
       return squaresHit;
     }
 
@@ -485,7 +474,6 @@ class Pawn extends React.Component {
       }
 
       const legalMoves = potentialMoves.filter(element => element.length > 0);
-      console.log(legalMoves);
       return legalMoves;
     }
 
@@ -713,7 +701,6 @@ class Pawn extends React.Component {
           
         }
       })
-      console.log(allSquaresHit);
       return allSquaresHit;
     }
   
@@ -736,15 +723,12 @@ class Pawn extends React.Component {
       potentialMoves[7] = '' + files[indexOfFile-1]+rank;
   
       potentialMoves = potentialMoves.filter(element => !element.includes('undefined'));
-      
-      console.log(potentialMoves);
-      
+            
       return potentialMoves;
     }
   
     handleClick(){
       const legalMoves = this.getLegalMoves(this.calculatePotentialMoves(this.props.coordinate));
-      console.log(legalMoves);
       this.props.onClick(this.props.coordinate, 
         {
           piece: 'K', color: this.props.color, legalMoves: legalMoves

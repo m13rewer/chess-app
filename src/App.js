@@ -187,6 +187,7 @@ class Game extends React.Component {
     const whiteToMove = this.state.whiteToMove;
     const colorOfTurn = whiteToMove ? 'white': 'black';
     const selectedPiece = this.state.selectedPiece;
+    
 
     if(!selectedPiece) {
       this.pieceSelection(coordinate, pieceObj);
@@ -204,11 +205,8 @@ class Game extends React.Component {
     }
 
     let legalMoves; 
-    const isCheck = this.isCheck(boardMap, whiteToMove);
 
-    if(isCheck && this.isCheckmate()) {
-      this.endGame();
-    }
+    const isCheck = this.isCheck(boardMap, whiteToMove);
 
     if(isCheck && selectedPiece.pieceObj.piece === 'K'){
       legalMoves = selectedPiece.pieceObj.legalMoves;
@@ -219,14 +217,14 @@ class Game extends React.Component {
     }
     else if(isCheck && selectedPiece.pieceObj.piece !== 'K') {
       const kingCoordinate = this.findKing(colorOfTurn, boardMap);
-      const sourcesOfCheck = this.sourcesOfCheck(kingCoordinate, colorOfTurn);
+      const sourcesOfCheck = this.piecesHittingCoordinate(kingCoordinate, colorOfTurn);
       
       this.setState({
         check: colorOfTurn,
         sourcesOfCheck: sourcesOfCheck
       });
 
-      legalMoves = this.getInCheckLegalMoves(boardMap, sourcesOfCheck);
+      legalMoves = this.getInCheckLegalMoves(sourcesOfCheck);
       legalMoves = selectedPiece.pieceObj.legalMoves.filter(element => legalMoves.includes(element));
 
       if(legalMoves.length === 0) {
@@ -277,11 +275,12 @@ class Game extends React.Component {
     return inCheckLegalMoves;
   }
 
-  isCheckmate() {
+  isCheckmate(whitesMove) {
+    console.log('isCheckmate');
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
-    const whiteToMove = this.state.whiteToMove;
+    const whiteToMove = whitesMove;
 
     const color = whiteToMove ? 'white' : 'black';
     const coordinate = this.findKing(color, boardMap);
@@ -293,12 +292,27 @@ class Game extends React.Component {
       coordinate: coordinate
     });
 
-    const legalKingMoves = king.getAllSquaresHit(king.calculatePotentialMoves(coordinate));
-    const sourcesOfCheck = this.sourcesOfCheck(coordinate, color);
+    const legalKingMoves = king.getLegalMoves(king.calculatePotentialMoves(coordinate));
+    const sourcesOfCheck = this.piecesHittingCoordinate(coordinate, color);
       
-    const legalMoves = this.getInCheckLegalMoves(boardMap, sourcesOfCheck).concat(legalKingMoves);
-
-    if(legalMoves.length === 0) {
+    const potentialBlocksOrCaptures = this.getInCheckLegalMoves(sourcesOfCheck);
+    let pieceCanCapture = false;
+    if(sourcesOfCheck.length === 1) {
+      pieceCanCapture = potentialBlocksOrCaptures.forEach(element => {
+        if(this.piecesHittingCoordinate(element, color).length > 0) return true;
+        return false;
+      });
+    }
+    
+    
+    //const legalMoves = potentialBlocksOrCaptures.concat(legalKingMoves);
+    console.log(pieceCanCapture);
+    console.log(sourcesOfCheck);
+    //console.log(legalMoves);
+    console.log(legalKingMoves);
+    if(legalKingMoves.length === 0 && !pieceCanCapture) {
+      console.log('isCheckmate');
+      alert('CHECKMATE');
       return true;
     }
 
@@ -306,7 +320,7 @@ class Game extends React.Component {
     
   }
 
-  sourcesOfCheck(kingCoordinate, colorInCheck) {
+  piecesHittingCoordinate(kingCoordinate, colorInCheck) {
     console.log('sourcesOfCheck()');
     const sourcesOfCheck = this.rookPath(kingCoordinate, colorInCheck)
     .concat(this.bishopPath(kingCoordinate, colorInCheck)
@@ -314,7 +328,7 @@ class Game extends React.Component {
         .concat(this.pawnPath(kingCoordinate, colorInCheck))
       )
     ).filter(element => element);
-    
+    console.log(sourcesOfCheck);
     return sourcesOfCheck;
   }
 
@@ -753,39 +767,6 @@ class Game extends React.Component {
     }
   }
 
-  canEnPassant(coordinate) {
-    const history = this.state.history.slice(0, 1);
-    const current = history[history.length - 1];
-    const boardMap = current.board;
-    const file = coordinate.substring(0, 1);
-    const rank = coordinate.substring(1);
-    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const indexOfFile = files.indexOf(file);
-    
-    const potentialPawnsEnPassant = [];
-    const squareOne = ''+files[indexOfFile+1] + rank;
-    const squareTwo = ''+files[indexOfFile-1] + rank;
-    
-    if(!squareOne.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareOne, pieceObj: boardMap.get(squareOne)});
-    if(!squareTwo.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareTwo, pieceObj: boardMap.get(squareTwo)});
-    
-    const pawnsEnPassant = potentialPawnsEnPassant.filter(element => element.pieceObj.piece === 'P');
-
-    return pawnsEnPassant;
-
-  }
-
-  isBigPawnPush(coordinate) {
-    const selectedPiece = this.state.selectedPiece;
-    const selectedPieceCoordinate = selectedPiece.coordinate;
-    const rank = Number.parseInt(coordinate.substring(1));
-    const selectedPieceRank = Number.parseInt(selectedPieceCoordinate.substring(1));
-    
-    if(Math.abs(rank - selectedPieceRank) === 2) return true;
-    return false;
-
-  }
-
   isEnPassant(coordinate) {
     console.log('isEnPassant()');
     const history = this.state.history.slice(0, 1);
@@ -807,6 +788,38 @@ class Game extends React.Component {
 
     if(file !== selectedPieceFile) return true;
     return false;
+  }
+
+  canEnPassant(coordinate) {
+    const history = this.state.history.slice(0, 1);
+    const current = history[history.length - 1];
+    const boardMap = current.board;
+    const file = coordinate.substring(0, 1);
+    const rank = coordinate.substring(1);
+    const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const indexOfFile = files.indexOf(file);
+    
+    const potentialPawnsEnPassant = [];
+    const squareOne = ''+files[indexOfFile+1] + rank;
+    const squareTwo = ''+files[indexOfFile-1] + rank;
+    
+    if(!squareOne.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareOne, pieceObj: boardMap.get(squareOne)});
+    if(!squareTwo.includes('undefined')) potentialPawnsEnPassant.push({coordinate: squareTwo, pieceObj: boardMap.get(squareTwo)});
+    
+    const pawnsEnPassant = potentialPawnsEnPassant.filter(element => element.pieceObj.piece === 'P');
+
+    return pawnsEnPassant;
+  }
+
+  isBigPawnPush(coordinate) {
+    const selectedPiece = this.state.selectedPiece;
+    const selectedPieceCoordinate = selectedPiece.coordinate;
+    const rank = Number.parseInt(coordinate.substring(1));
+    const selectedPieceRank = Number.parseInt(selectedPieceCoordinate.substring(1));
+    
+    if(Math.abs(rank - selectedPieceRank) === 2) return true;
+    return false;
+
   }
 
   getPieceInstance(pieceObj, coordinate) {
@@ -855,14 +868,6 @@ class Game extends React.Component {
         });
       default: return;
     }
-  }
-
-  promote(coordinate, boardMap) {
-
-  }
-
-  pickPiece() {
-
   }
 
   movePiece(coordinate) {
@@ -916,14 +921,8 @@ class Game extends React.Component {
         });
       }
     }
-    console.log('beforePromtoe');
-    console.log(selectedPiece);
-    console.log(coordinate.substring(1));
-    
 
     if(selectedPiece.pieceObj.piece === 'P' && (coordinate.substring(1) === '1' || coordinate.substring(1) === '8')) {
-      console.log('promote');
-      //this.promote(coordinate);
       boardMap.set(coordinate, {piece: 'PP', color: whiteToMove ? 'white': 'black'});
       this.setState({
         history: history.concat([
@@ -936,7 +935,6 @@ class Game extends React.Component {
       return false;
     }
 
-
     this.setState({
       history: history.concat([
         {
@@ -945,6 +943,21 @@ class Game extends React.Component {
       ]),
       selectedPiece: null
     });
+
+    const isCheck = this.isCheck(boardMap, !whiteToMove);
+    console.log(isCheck);
+      if(isCheck && this.isCheckmate(!whiteToMove)) {
+
+        this.setState({
+          history: history.concat([
+            {
+              board: boardMap
+            }
+          ]),
+          selectedPiece: null
+        });
+        this.endGame();
+      }
 
     
     return true;
@@ -956,7 +969,7 @@ class Game extends React.Component {
     const boardMap = current.board;
 
     boardMap.set(coordinate, piece);
-    history[history - 1] = boardMap;
+    history[history.length - 1] = boardMap;
     this.setState({
       history: history,
       selectedPiece: null

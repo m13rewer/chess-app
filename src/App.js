@@ -42,6 +42,7 @@ class Square extends React.Component {
 class Board extends React.Component {
 
   renderSquare(coordinate, piece, bool) {
+    console.log(this.props.board);
     return (
       <Square 
         key={coordinate} 
@@ -56,6 +57,8 @@ class Board extends React.Component {
 
   render() {
     const renderBoard = () => {
+      console.log('renderBoard()');
+      console.log(this.props.board);
       const board = this.props.board;
       let bool = false;
       let squares = [];
@@ -964,12 +967,16 @@ class Game extends React.Component {
   }
 
   handlePromotion(coordinate, piece) {
+    console.log('handlePromotion');
+    console.log(coordinate, piece);
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
+    console.log(boardMap);
 
     boardMap.set(coordinate, piece);
-    history[history.length - 1] = boardMap;
+    history[history.length - 1].board = boardMap;
+    console.log(history);
     this.setState({
       history: history,
       selectedPiece: null
@@ -978,9 +985,12 @@ class Game extends React.Component {
   }
 
   render() {
+    console.log('render()');
     const historyLength = this.state.history.length;
+    console.log(historyLength);
+    
     const current = this.state.history[historyLength-1];
-   
+    console.log(current);
     return (
       <div>
         <Board onClick={(coordinate, piece) => this.handleClick(coordinate, piece)} 

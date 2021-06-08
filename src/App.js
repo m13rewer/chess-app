@@ -2,6 +2,9 @@ import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import {PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
+import { GameLiftClient, AcceptMatchCommand } from "@aws-sdk/client-gamelift";
+import { LambdaClient, AddLayerVersionPermissionCommand } from "@aws-sdk/client-lambda";
+import * as AWS from 'aws-sdk';
 
 class Square extends React.Component {
 
@@ -42,7 +45,7 @@ class Square extends React.Component {
 class Board extends React.Component {
 
   renderSquare(coordinate, piece, bool) {
-    console.log(this.props.board);
+    //console.log(this.props.board);
     return (
       <Square 
         key={coordinate} 
@@ -142,9 +145,58 @@ class Game extends React.Component {
   startGame() {
     //we make some kind of api call
     this.fakeApiCall();
-    
+    this.connectToGameLift();
     console.log(this.state);
 
+  }
+
+  async connectToGameLift() {
+    console.log('connectToGameLift');
+    // Initialize the Amazon Cognito credentials provider
+    AWS.config.region = 'us-west-1'; // Region
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: 'us-west-1:9baa28a7-f0bc-4a1b-af01-bd6a69aa52be',
+    });
+    const client = new AWS.Lambda({region: 'us-west-1'});
+    const invokeInput = 
+      {
+          FunctionName: 'arn:aws:lambda:us-west-1:027277102062:function:ChessAppClient',
+          InvocationType : 'RequestResponse'
+          
+      };
+
+    try {
+      const data = await client.invoke(invokeInput, function(err, data) {
+        if (err) {
+           console.log(err);
+        } else {
+           const pullResults = JSON.parse(data.Payload);
+           console.log(pullResults);
+        }
+     });	
+      console.log(data);
+    } catch(error) {
+      console.log(error);
+    }
+    const params = {
+      /** input parameters */
+    };
+    // const command = new AcceptMatchCommand(params);
+
+    // try {
+    //   const data = await client.send(command);
+    //   // process data.
+    // } catch (error) {
+    //   const { requestId, cfId, extendedRequestId } = error.$metadata;
+    //   console.log({ requestId, cfId, extendedRequestId });
+    //   /**
+    //    * The keys within exceptions are also parsed.
+    //    * You can access them by specifying exception names:
+    //    * if (error.name === 'SomeServiceException') {
+    //    *     const value = error.specialKeyInException;
+    //    * }
+    //    */
+    // }
   }
 
   fakeApiCall() {

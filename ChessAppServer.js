@@ -28,8 +28,8 @@ const OP_CODE_DISCONNECT_NOTIFICATION = 114;
 // Example groups for user-defined groups
 // Any positive group number can be defined here. These should match your client code.
 // When referring to user-defined groups, "-1" represents all groups, "0" is reserved.
-const WHITE = 1;
-const BLACK = 2;
+const RED_TEAM_GROUP = 1;
+const BLUE_TEAM_GROUP = 2;
 
 // Called when game server is initialized, passed server's object of current session
 function init(rtSession) {
@@ -137,6 +137,8 @@ function onPlayerLeaveGroup(groupId, peerId) {
     return true;
 }
 
+// A simple tick loop example
+// Checks to see if a minimum amount of time has passed before seeing if the game has ended
 async function tickLoop() {
     const elapsedTime = getTimeInS() - startTime;
     logger.info("Tick... " + elapsedTime + " activePlayers: " + activePlayers);

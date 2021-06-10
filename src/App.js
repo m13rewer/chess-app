@@ -5,6 +5,7 @@ import {PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './p
 import { GameLiftClient, AcceptMatchCommand } from "@aws-sdk/client-gamelift";
 import { LambdaClient, AddLayerVersionPermissionCommand } from "@aws-sdk/client-lambda";
 import * as AWS from 'aws-sdk';
+import { subscribeToGameLiftServer } from './api';
 
 class Square extends React.Component {
 
@@ -104,6 +105,7 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super(props);
+
       this.state = {
         history: [
           {
@@ -138,8 +140,26 @@ class Game extends React.Component {
         moves: [],
         pieces: [],
         check: null,
-        whiteToMove: true
+        whiteToMove: true,
+        gameLiftSessionObject: null,
+        message: null
       }
+
+      subscribeToGameLiftServer((err, msg) => 
+        {
+          console.log(err);
+          this.setState({ 
+          message: msg
+        
+        })
+
+        this.handleMessage(msg);
+      });
+  }
+
+  handleMessage(msg) {
+    console.log("handleMessage");
+    alert(""+msg);
   }
 
   startGame() {
@@ -157,46 +177,42 @@ class Game extends React.Component {
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
         IdentityPoolId: 'us-west-1:9baa28a7-f0bc-4a1b-af01-bd6a69aa52be',
     });
-    const client = new AWS.Lambda({region: 'us-west-1'});
+    const lambdaClient = new AWS.Lambda({region: 'us-west-1'});
+    
     const invokeInput = 
       {
-          FunctionName: 'arn:aws:lambda:us-west-1:027277102062:function:ChessAppClient',
-          InvocationType : 'RequestResponse'
-          
+        FunctionName: 'arn:aws:lambda:us-west-1:027277102062:function:ChessAppClient',
+        InvocationType : 'RequestResponse'
       };
 
+    let pullResults;
+    const gameComponent = this;
+
     try {
-      const data = await client.invoke(invokeInput, function(err, data) {
+      const data = await lambdaClient.invoke(invokeInput, function(err, data) {
         if (err) {
            console.log(err);
         } else {
-           const pullResults = JSON.parse(data.Payload);
-           console.log(pullResults);
+           pullResults = JSON.parse(data.Payload);
+           //console.log(pullResults);
+           //return pullResults;
+           gameComponent.setState(
+            {
+              gameLiftSessionObject: pullResults
+            });
         }
      });	
       console.log(data);
     } catch(error) {
       console.log(error);
     }
-    const params = {
-      /** input parameters */
-    };
-    // const command = new AcceptMatchCommand(params);
 
-    // try {
-    //   const data = await client.send(command);
-    //   // process data.
-    // } catch (error) {
-    //   const { requestId, cfId, extendedRequestId } = error.$metadata;
-    //   console.log({ requestId, cfId, extendedRequestId });
-    //   /**
-    //    * The keys within exceptions are also parsed.
-    //    * You can access them by specifying exception names:
-    //    * if (error.name === 'SomeServiceException') {
-    //    *     const value = error.specialKeyInException;
-    //    * }
-    //    */
-    // }
+  }
+
+  async sendMoves(coordinate, piece) {
+    const gameLiftClient = new AWS.GameLift({region: 'us-west-1'});
+    
+    
   }
 
   fakeApiCall() {
@@ -1038,6 +1054,9 @@ class Game extends React.Component {
 
   render() {
     console.log('render()');
+    // window.addEventListener('message', (event) => {
+    //   alert(event.data);
+    // })
     const historyLength = this.state.history.length;
     console.log(historyLength);
     

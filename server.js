@@ -1,20 +1,21 @@
-const httpServer = require("http").createServer();
-const io = require('socket.io')(httpServer, {
-    cors: {
-      origin: "http://localhost:3006/",
-      methods: ["GET", "POST"]
-    }
-  });
+const express = require('express');
+const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 
-io.on('connection', (client) => {
-    client.on('subscribeToTimer', (interval) => {
-      console.log('client is subscribing to timer with interval ', interval);
-      setInterval(() => {
-        client.emit('timer', new Date());
-      }, interval);
+// app.get('/', (req, res) => {
+//     res.sendFile(__dirname + '/src/App.js');
+// });
+
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    socket.on('chat message', (msg) => {
+        io.emit('chat message', msg);
     });
-  });
-
-const port = 8000;
-io.listen(port);
-console.log('listening on port ', port);
+});
+  
+server.listen(3000, () => {
+    console.log('listening on *:3000');
+});

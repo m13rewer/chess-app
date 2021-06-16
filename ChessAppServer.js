@@ -33,8 +33,10 @@ const BLUE_TEAM_GROUP = 2;
 
 // Called when game server is initialized, passed server's object of current session
 function init(rtSession) {
+   
     session = rtSession;
     logger = session.getLogger();
+    logger.info("init()");
 }
 
 // On Process Started is called when the process has begun and we need to perform any
@@ -54,7 +56,7 @@ function onProcessStarted(args) {
 // Called when a new game session is started on the process
 function onStartGameSession(gameSession) {
     // Complete any game session set-up
-
+    logger.info("onStartGameSession()");
     // Set up an example tick loop to perform server initiated actions
     startTime = getTimeInS();
     tickLoop();
@@ -75,6 +77,9 @@ function onHealthCheck() {
 // Return true if player should connect, false to reject
 function onPlayerConnect(connectMsg) {
     // Perform any validation needed for connectMsg.payload, connectMsg.peerId
+    logger.info("onPlayerConnect()");
+    logger.info("Connect Message "+connectMsg);
+    activePlayers++;
     return true;
 }
 
@@ -147,6 +152,7 @@ async function tickLoop() {
     // Call processEnding() to terminate the process and quit
     if ( (activePlayers == 0) && (elapsedTime > minimumElapsedTime)) {
         logger.info("All players disconnected. Ending game");
+        logger.info(session);
         const outcome = await session.processEnding();
         logger.info("Completed process ending with: " + outcome);
         process.exit(0);

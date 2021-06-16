@@ -4,8 +4,9 @@ import React from 'react';
 import {PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
 import { GameLiftClient, AcceptMatchCommand } from "@aws-sdk/client-gamelift";
 import { LambdaClient, AddLayerVersionPermissionCommand } from "@aws-sdk/client-lambda";
-import * as AWS from 'aws-sdk';
-import { subscribeToGameLiftServer } from './api';
+// import * as AWS from 'aws-sdk';
+// import { subscribeToGameLiftServer } from './api';
+import io from 'socket.io-client';
 
 class Square extends React.Component {
 
@@ -141,20 +142,10 @@ class Game extends React.Component {
         pieces: [],
         check: null,
         whiteToMove: true,
-        gameLiftSessionObject: null,
-        message: null
+        matchObject: null,
+        message: null,
+        //socket: io('http://localhost:3000/')
       }
-
-      subscribeToGameLiftServer((err, msg) => 
-        {
-          console.log(err);
-          this.setState({ 
-          message: msg
-        
-        })
-
-        this.handleMessage(msg);
-      });
   }
 
   handleMessage(msg) {
@@ -162,56 +153,69 @@ class Game extends React.Component {
     alert(""+msg);
   }
 
+  async sendMessage() {
+    console.log('sendMessage()');
+    
+  }
+
   startGame() {
     //we make some kind of api call
     this.fakeApiCall();
-    this.connectToGameLift();
+    this.connectToGameServer();
     console.log(this.state);
-
+    
   }
 
-  async connectToGameLift() {
-    console.log('connectToGameLift');
-    // Initialize the Amazon Cognito credentials provider
-    AWS.config.region = 'us-west-1'; // Region
-    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: 'us-west-1:9baa28a7-f0bc-4a1b-af01-bd6a69aa52be',
-    });
-    const lambdaClient = new AWS.Lambda({region: 'us-west-1'});
+  connectToGameServer() {
+    console.log('connectToGameServer');
     
-    const invokeInput = 
-      {
-        FunctionName: 'arn:aws:lambda:us-west-1:027277102062:function:ChessAppClient',
-        InvocationType : 'RequestResponse'
-      };
+    const socket = io('http://localhost:3000/', { autoConnect: false });
+    const username = "m13rewer" + Math.floor((Math.random()*500));
+    
+    socket.auth = { username: username };
+    socket.connect();
 
-    let pullResults;
-    const gameComponent = this;
+    this.setState({
+      socket: socket,
+      username: username
+    });
 
-    try {
-      const data = await lambdaClient.invoke(invokeInput, function(err, data) {
-        if (err) {
-           console.log(err);
-        } else {
-           pullResults = JSON.parse(data.Payload);
-           //console.log(pullResults);
-           //return pullResults;
-           gameComponent.setState(
-            {
-              gameLiftSessionObject: pullResults
-            });
+    const context = this;
+    socket.on('private message', function(msg) {
+        
+      context.handleMessage(msg);
+    });
+
+    socket.on('chat message', function(msg) {
+      
+      const playerObj = msg.player1.username === username ? msg.player1: msg.player2;
+      context.setState(
+        {
+          matchObject: msg,
+          player: {
+            color: playerObj.color,
+            isMyTurn: playerObj.color === 'white' ? true: false,
+            status: 'playing',
+            opponent: !(msg.player1.username === username) ? msg.player1: msg.player2
+          },
         }
-     });	
-      console.log(data);
-    } catch(error) {
-      console.log(error);
-    }
+      );
+    });
 
   }
 
   async sendMoves(coordinate, piece) {
-    const gameLiftClient = new AWS.GameLift({region: 'us-west-1'});
-    
+    const socket = this.state.socket;
+    const opponent = this.state.opponent;
+
+    socket.emit("private message", {
+      content: 
+        {
+          coordinate: coordinate,
+          piece: piece
+        },
+      to: opponent.socketID,
+    });
     
   }
 
@@ -1068,6 +1072,7 @@ class Game extends React.Component {
         board={current.board} 
         onPromote={(coordinate, piece) => this.handlePromotion(coordinate, piece)}/>
         <button onClick={() => this.startGame()}>Create Game</button>
+        <button onClick={() => this.sendMessage()}>Message</button>
       </div>
     );
   }

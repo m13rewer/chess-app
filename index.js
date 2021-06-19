@@ -13,6 +13,7 @@ const io = require("socket.io") (server, {
 
 const openGames = [];
 const closedGames = [];
+let connectedUsers = [];
 let i = 0;
 
 app.get('/game', (req, res) => {
@@ -33,8 +34,6 @@ app.get('/game', (req, res) => {
 
         }
     
-    //closedGames[i] = openGames[0];
-    
     res.send(
         {
             gameIndex: i,
@@ -42,8 +41,6 @@ app.get('/game', (req, res) => {
             player2: ""
 
         });
-
-    //i++;
 });
 
 function matchMaking(auth, socketID) {
@@ -54,9 +51,10 @@ function matchMaking(auth, socketID) {
                     {
                         username: auth.username,
                         socketID: socketID,
-                        color: white
+                        color: 'white'
                     },
-                player2: null
+                player2: null,
+                room: auth.username
             };
 
         openGames.unshift(gameObj);
@@ -68,7 +66,7 @@ function matchMaking(auth, socketID) {
             {
                 username: auth.username,
                 socketID: socketID,
-                color: black
+                color: 'black'
             };
             
         return openGames[0];
@@ -88,7 +86,7 @@ io.use((socket, next) => {
     next();
   });
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     console.log('a user connected');
     console.log(socket.userID);
     
@@ -96,34 +94,43 @@ io.on('connection', (socket) => {
     const socketID = socket.id;
     console.log(auth);
 
-    if(auth !== undefined) {
+    socket.onAny((event, ...args) => {
+        console.log("onAny()");
+        console.log(event, args);
+    });
+
+    socket.on("private message", ({ content, to, room }) => {
+        console.log(to);
+        console.log('private message');
+
+        socket.to(room).to(to).emit("private message", {
+          content,
+          from: socket.id,
+        });
+    });
+
+    if(auth !== undefined && !connectedUsers.includes(auth.username)) {
+
         const match = matchMaking(auth, socketID);
         const player2 = match.player2;
         const player1 = match.player1;
+        connectedUsers.unshift(auth.username);
         console.log(match);
+        socket.join(match.room);
 
         if(player2 === null) return;
+        console.log(match.room)
+        socket.join(match.room);
 
-        socket.join(player1.socketID);
-
-        io.to(player1.socketID).emit("chat message", {
+        //console.log(io.sockets);
+        io.to(match.room).emit("chat message", {
             content: match,
-            from: socketID
+            from: player2.socketID
         });
-
-        // socket.to(player2.socketID).emit("chat message", {
-        //     content: match,
-        //     from: player1.socketID
-        // });
         
     }
 
-    socket.on("private message", ({ content, to }) => {
-        socket.to(to).emit("private message", {
-          content: content,
-          from: socket.id,
-        });
-      });
+    
 });
 
 server.listen(3000, '127.0.0.1',() => {

@@ -160,7 +160,7 @@ class Game extends React.Component {
 
   startGame() {
     //we make some kind of api call
-    this.fakeApiCall();
+    //this.fakeApiCall();
     this.connectToGameServer();
     console.log(this.state);
     
@@ -181,14 +181,25 @@ class Game extends React.Component {
     });
 
     const context = this;
+
     socket.on('private message', function(msg) {
-        
-      context.handleMessage(msg);
+      console.log('private message');
+      console.log(msg);
+      const content = msg.content;
+      const piece = content.piece;
+      const coordinate = content.coordinate;
+
+      context.movePiece(coordinate, piece);
     });
 
     socket.on('chat message', function(msg) {
-      
-      const playerObj = msg.player1.username === username ? msg.player1: msg.player2;
+      console.log("chat message");
+      console.log(msg);
+      const content = msg.content;
+      const playerObj = content.player1.username == username ? content.player1: content.player2;
+      console.log(content.player1.username);
+      console.log(playerObj);
+      console.log(username);
       context.setState(
         {
           matchObject: msg,
@@ -196,17 +207,21 @@ class Game extends React.Component {
             color: playerObj.color,
             isMyTurn: playerObj.color === 'white' ? true: false,
             status: 'playing',
-            opponent: !(msg.player1.username === username) ? msg.player1: msg.player2
+            opponent: !(content.player1.username === username) ? content.player1: content.player2
           },
         }
       );
     });
-
   }
 
-  async sendMoves(coordinate, piece) {
+  sendMoves(coordinate, piece) {
+    console.log('sendMoves()');
+    
+    
     const socket = this.state.socket;
-    const opponent = this.state.opponent;
+    const room = this.state.matchObject.room;
+    const opponent = this.state.player.opponent;
+    console.log(opponent);
 
     socket.emit("private message", {
       content: 
@@ -214,6 +229,7 @@ class Game extends React.Component {
           coordinate: coordinate,
           piece: piece
         },
+      room: room,
       to: opponent.socketID,
     });
     
@@ -314,10 +330,13 @@ class Game extends React.Component {
         sourcesOfCheck: null
       });
     }
-    
+
     if(legalMoves.includes(coordinate)) {
       console.log("coordinateMatches");
-      if(!this.movePiece(coordinate)) return;
+      if(!this.movePiece(coordinate, selectedPiece)) {
+        return; 
+      }
+      this.sendMoves(coordinate, selectedPiece);
       this.switchTurns();
 
       return;
@@ -330,8 +349,8 @@ class Game extends React.Component {
   switchTurns() {
     const whiteToMove = this.state.whiteToMove;
     this.setState({
-      whiteToMove: !whiteToMove,
-      player: {color: !whiteToMove ? 'white': 'black', isMyTurn: true, status: 'playing'} //this is temporary because we will never change player color during a real game
+      whiteToMove: !whiteToMove
+       //this is temporary because we will never change player color during a real game
     });
   }
 
@@ -856,10 +875,10 @@ class Game extends React.Component {
     return false;
   }
 
-  isPawnCapture(coordinate) {
+  isPawnCapture(coordinate, selectedPiece) {
     console.log('isPawnCapture()');
     const file = coordinate.substring(0, 1);
-    const selectedPieceFile = this.state.selectedPiece.coordinate.substring(0, 1);
+    const selectedPieceFile = selectedPiece.coordinate.substring(0, 1);
 
     if(file !== selectedPieceFile) return true;
     return false;
@@ -886,8 +905,8 @@ class Game extends React.Component {
     return pawnsEnPassant;
   }
 
-  isBigPawnPush(coordinate) {
-    const selectedPiece = this.state.selectedPiece;
+  isBigPawnPush(coordinate, piece) {
+    const selectedPiece = piece;
     const selectedPieceCoordinate = selectedPiece.coordinate;
     const rank = Number.parseInt(coordinate.substring(1));
     const selectedPieceRank = Number.parseInt(selectedPieceCoordinate.substring(1));
@@ -945,11 +964,12 @@ class Game extends React.Component {
     }
   }
 
-  movePiece(coordinate) {
+  movePiece(coordinate, piece) {
+    console.log("movePiece()");
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;
-    const selectedPiece = this.state.selectedPiece;
+    const selectedPiece = piece;
     const whiteToMove = this.state.whiteToMove;
 
     if(selectedPiece.pieceObj.piece === 'K' && !selectedPiece.pieceObj.moved) {
@@ -969,7 +989,7 @@ class Game extends React.Component {
       selectedPiece.pieceObj.moved = true;
     }
     
-    if(selectedPiece.pieceObj.piece === 'P' && this.isPawnCapture(coordinate)) {
+    if(selectedPiece.pieceObj.piece === 'P' && this.isPawnCapture(coordinate, selectedPiece)) {
       if(this.isEnPassant(coordinate)) {
         const file = coordinate.substring(0, 1);
         const rank = Number.parseInt(coordinate.substring(1));
@@ -986,7 +1006,7 @@ class Game extends React.Component {
     boardMap.set(coordinate, selectedPiece.pieceObj);
     boardMap.set(selectedPiece.coordinate, {piece: '', color: ''});
 
-    if(selectedPiece.pieceObj.piece === 'P' && this.isBigPawnPush(coordinate)) {
+    if(selectedPiece.pieceObj.piece === 'P' && this.isBigPawnPush(coordinate, selectedPiece)) {
       const enPassantPawns = this.canEnPassant(coordinate);
       
       if(enPassantPawns.length > 0) {

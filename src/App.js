@@ -1,9 +1,24 @@
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import {PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
-import { GameLiftClient, AcceptMatchCommand } from "@aws-sdk/client-gamelift";
-import { LambdaClient, AddLayerVersionPermissionCommand } from "@aws-sdk/client-lambda";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useHistory,
+  Redirect
+} from "react-router-dom";
+
+import {
+  PrivateRoute,
+  User,
+  Register,
+  Login
+} from './auth.js';
+// import { GameLiftClient, AcceptMatchCommand } from "@aws-sdk/client-gamelift";
+// import { LambdaClient, AddLayerVersionPermissionCommand } from "@aws-sdk/client-lambda";
 // import * as AWS from 'aws-sdk';
 // import { subscribeToGameLiftServer } from './api';
 import io from 'socket.io-client';
@@ -1104,10 +1119,57 @@ function App() {
       <header className="App-header">
         
       </header>
-      <Game />
+      
+      <Router>
+        <div>
+          <nav>
+            <ul>
+            <li>
+                <Link to="/register">Register</Link>
+              </li>
+              <li>
+                <Link to="/login">Login</Link>
+              </li>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+            </ul>
+          </nav>
+
+          {/* A <Switch> looks through its children <Route>s and
+              renders the first one that matches the current URL. */}
+          <Switch>
+            <Route path="/register">
+              <Register/>
+            </Route>
+            <Route path="/login">
+              <Login/>
+            </Route>
+            <PrivateRoute path="/">
+              <Game />
+            </PrivateRoute>
+          </Switch>
+        </div>
+      </Router>
+    </div>
+  );
+}
+
+function Home() {
+
+  //const history = useHistory();
+  //if(!User.auth) history.push("/login");
+
+  return (
+    <div>
+      <h2>Home</h2>
+      <Game/>
+      
       
     </div>
   );
 }
+
+
 
 export default App;

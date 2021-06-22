@@ -122,7 +122,6 @@ io.on('connection', async (socket) => {
         console.log(match.room)
         socket.join(match.room);
 
-        //console.log(io.sockets);
         io.to(match.room).emit("chat message", {
             content: match,
             from: player2.socketID

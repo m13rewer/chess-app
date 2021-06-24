@@ -14,37 +14,37 @@ const io = require("socket.io") (server, {
 const openGames = [];
 const closedGames = [];
 let connectedUsers = [];
-let i = 0;
+// let i = 0;
 
-app.get('/game', (req, res) => {
-    console.log(req);
-    if(openGames.length > 0) {
-        openGames[0].player2 = "";
-        openGames[0].black = "";
-        return;
+// app.get('/game', (req, res) => {
+//     console.log(req);
+//     if(openGames.length > 0) {
+//         openGames[0].player2 = "";
+//         openGames[0].black = "";
+//         return;
         
-    }
+//     }
 
-    openGames[0] = 
-        {
-            player1: "",
-            player2: null,
-            white: "",
-            black: null
+//     openGames[0] = 
+//         {
+//             player1: "",
+//             player2: null,
+//             white: "",
+//             black: null
 
-        }
+//         }
     
-    res.send(
-        {
-            gameIndex: i,
-            player1: "",
-            player2: ""
+//     res.send(
+//         {
+//             gameIndex: i,
+//             player1: "",
+//             player2: ""
 
-        });
-});
+//         });
+// });
 
 function matchMaking(auth, socketID) {
-    if(openGames.length === 0) {
+    if(openGames.length === 0 || (openGames.length > 0 && openGames[0].player2)) {
         const gameObj = 
             {
                 player1: 
@@ -61,15 +61,18 @@ function matchMaking(auth, socketID) {
         return gameObj;
     }
 
-    if(openGames.length > 0) {
-        openGames[0].player2 = 
+    if(openGames.length > 0 && !openGames[0].player2) {
+        const matchObj = openGames[0];
+        matchObj.player2 = 
             {
                 username: auth.username,
                 socketID: socketID,
                 color: 'black'
             };
+
+        openGames.shift();
             
-        return openGames[0];
+        return matchObj;
     }
 }
 
@@ -88,11 +91,14 @@ io.use((socket, next) => {
 
 io.on('connection', async (socket) => {
     console.log('a user connected');
-    console.log(socket.userID);
+    
     
     const auth = socket.handshake.auth;
     const socketID = socket.id;
+    socket.userID = auth.username;
     console.log(auth);
+    console.log(socket.userID);
+
 
     socket.onAny((event, ...args) => {
         console.log("onAny()");
@@ -110,11 +116,13 @@ io.on('connection', async (socket) => {
     });
 
     if(auth !== undefined && !connectedUsers.includes(auth.username)) {
-
+        console.log("auth");
         const match = matchMaking(auth, socketID);
         const player2 = match.player2;
-        const player1 = match.player1;
+        socket.matchObj = match;
+        //const player1 = match.player1;
         connectedUsers.unshift(auth.username);
+        console.log(connectedUsers);
         console.log(match);
         socket.join(match.room);
 
@@ -126,10 +134,18 @@ io.on('connection', async (socket) => {
             content: match,
             from: player2.socketID
         });
-        
     }
 
-    
+    socket.on('disconnect', (reason) => {
+        console.log('disconnect');
+        console.log(socket.matchObj);
+        const room = socket.matchObj.room;
+        connectedUsers = connectedUsers.filter(element => element !== socket.userID);
+        console.log(connectedUsers);
+        io.to(room).emit("end game");
+        
+    });
+
 });
 
 server.listen(3000, '127.0.0.1',() => {

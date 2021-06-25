@@ -9,6 +9,7 @@ import {
   } from "react-router-dom";
 import {Home} from './App.js';
 import React from 'react';
+const https = require('https');
 
 
 function Login () {
@@ -36,11 +37,34 @@ function Login () {
     }
   }
   
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
       
-      //login api call
-      User.auth = true;
-      history.push("/");
+    
+    const options = {
+      hostname: '0t20d3rcf4.execute-api.us-west-1.amazonaws.com/default',
+      path: '/ChessAppClient',
+      method: 'GET'
+    };
+
+    const req = https.request(options, res => {
+      console.log(`statusCode: ${res.statusCode}`);
+      console.log(res);
+
+      res.on('data', d => {
+        console.log(JSON.stringify(d));
+      });
+    });
+
+    req.on('error', error => {
+      console.error(error);
+    });
+
+    req.end();
+    
+    
+    
+    User.auth = true;
+    history.push("/");
   }
   
     

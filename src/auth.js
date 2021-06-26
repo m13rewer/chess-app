@@ -41,28 +41,31 @@ function Login () {
       
     
     const options = {
-      hostname: '0t20d3rcf4.execute-api.us-west-1.amazonaws.com/default',
-      path: '/ChessAppClient',
+      hostname: '4kvh5oaf6f.execute-api.us-west-1.amazonaws.com/test',
+      path: '/login',
+      headers: {
+        "content-type": "application/json"
+      },
       method: 'GET'
     };
 
-    const req = https.request(options, res => {
-      console.log(`statusCode: ${res.statusCode}`);
-      console.log(res);
+    https.get('https://4kvh5oaf6f.execute-api.us-west-1.amazonaws.com/test/login', (resp) => {
+      let data = '';
 
-      res.on('data', d => {
-        console.log(JSON.stringify(d));
+      // A chunk of data has been received.
+      resp.on('data', (chunk) => {
+        data += chunk;
       });
+
+      // The whole response has been received. Print out the result.
+      resp.on('end', () => {
+        console.log(JSON.parse(data));
+      });
+
+    }).on("error", (err) => {
+      console.log("Error: " + err.message);
     });
 
-    req.on('error', error => {
-      console.error(error);
-    });
-
-    req.end();
-    
-    
-    
     User.auth = true;
     history.push("/");
   }

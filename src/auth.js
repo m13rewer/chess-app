@@ -160,30 +160,6 @@ function Register() {
       .catch((error) => {
         console.error(error);
       });
-
-    // await https.post(invokeURL+`username=${username}&password=${password}&firstname=${firstname}&lastname=${lastname}&email=${email}`, (resp) => {
-    //   let data = '';
-
-    //   resp.on('data', (chunk) => {
-    //     data += chunk;
-    //   });
-
-      
-    //   resp.on('end', () => {
-    //     dataObj = JSON.parse(data);
-    //     if(dataObj.Password !== undefined) {
-    //       history.push("/login");
-    //     }
-        
-    //     console.log(dataObj);
-    //     console.log(JSON.parse(data));
-        
-    //   });
-
-    // }).on("error", (err) => {
-    //   console.log("Error: " + err.message);
-    //   return;
-    // });
     
     setTimeout(() => {console.log(User)}, 1000);
   }
@@ -198,7 +174,7 @@ function Register() {
         <input type="text" placeholder="Username" name="username" onChange={(event) => handleChange(event)}/>
         <input type="password" placeholder="Password" name="password" onChange={(event) => handleChange(event)}/>
         <input type="text" placeholder="Email" onChange={(event) => handleChange(event)}/>
-        <input type="button" value="Register" onClick={() => handleSubmit()}/>
+        <input type="button" value="Register" name="email" onClick={() => handleSubmit()}/>
       </form>
     </div>
   );

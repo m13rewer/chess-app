@@ -45,37 +45,31 @@ function Login () {
     const password = state.password;
     console.log(username);
     console.log(password);
-    let dataObj;
 
-    https.get(`https://4kvh5oaf6f.execute-api.us-west-1.amazonaws.com/test/login?username=${username}&password=${password}`, (resp) => {
-      let data = '';
-
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      
-      resp.on('end', () => {
-        dataObj = JSON.parse(data);
-        if(dataObj.Password !== undefined) {
+    const invokeURL = `https://4kvh5oaf6f.execute-api.us-west-1.amazonaws.com/test/login?`;
+    const requestParams = `username=${username}&password=${password}`;
+    
+    axios
+      .post(invokeURL+requestParams)
+      .then((res) => {
+        let dataObj = res.data;
+        if('Password' in dataObj) {
           User.username = dataObj.Username;
           User.auth = true;
+          window.sessionStorage.setItem("User", JSON.stringify(User));
           history.push("/");
         }
-        console.log(User);
-        console.log(dataObj);
-        console.log(JSON.parse(data));
         
+        console.log(dataObj);
+        //console.log(JSON.parse(data));
+        console.log(`statusCode: ${res.status}`);
+        console.log(res);
+      })
+      .catch((error) => {
+        console.error(error);
       });
-
-    }).on("error", (err) => {
-      console.log("Error: " + err.message);
-      return;
-    });
-    console.log(User.auth);
-    setTimeout(() => {console.log(User)}, 1000);
-    //User.auth = true;
-    //history.push("/");
+    
+    setTimeout(() => {console.log(window.sessionStorage.getItem("User"))}, 1000);
   }
   
     
@@ -194,7 +188,7 @@ function Register() {
         <Route
           {...rest}
           render={({ location }) =>
-            User.auth ? (
+            window.sessionStorage.getItem("User") ? (
               children
             ) : (
               <Redirect

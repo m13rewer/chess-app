@@ -228,7 +228,7 @@ class Game extends React.Component {
     
   }
 
-  connectToGameServer(f) {
+  connectToGameServer(flipBoard) {
     console.log('connectToGameServer');
     if(this.state.player.status === 'playing') return;
     
@@ -301,7 +301,7 @@ class Game extends React.Component {
           whiteToMove: true,
         }
       );
-      f(playerObj.color);
+      flipBoard(playerObj.color);
     });
 
     socket.on('end game', function() {

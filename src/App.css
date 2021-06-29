@@ -1,22 +1,47 @@
 .square {
     /* display: inline-block; */
     /* border: solid black 1px; */
-    height: 40px;
-    width: 40px;
+    height: 60px;
+    width: 60px;
     float: left;
 }
 
 #board {
-    margin-right: auto;
-    margin-left: auto;
+    
     /* display: block; */
     /* margin-top: 10px; */
     width: fit-content;
-    height: 320px;
+    height: 500px;
 }
-.flip-board {
-    transform: rotate(180deg);
+#root > div > div {
+    height: inherit;
 }
+#root > div > div > div {
+    height: 640px;
+}
+#root > div > div > div > div {
+    height: 600px;
+}
+nav {
+    height: 50px;
+}
+
+nav > ul {
+    height: inherit;
+    padding-left: 0;
+    padding-top: 10px;
+}
+
+a {
+    text-decoration: none;
+}
+
+#root > div > div > nav > ul > li {
+    float: left;
+    list-style-type: none;
+    margin-right: 15px;
+}
+
 .flip {
     transform: rotate(180deg);
 }
@@ -28,7 +53,7 @@ p {
 }
 
 img{
-    width: 1px;
+    width: 3px;
 }
 
 .rank-8 {
@@ -86,7 +111,7 @@ i {
     margin-left: 20%;
     width: 60%;
     text-align: center;
-    font-size: 25px;
+    font-size: 35px;
 }
 
 .overflow {

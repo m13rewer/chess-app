@@ -7,10 +7,18 @@
 }
 
 #board {
-    width: fit-content;
     margin-right: auto;
     margin-left: auto;
-    margin-top: 10px;
+    /* display: block; */
+    /* margin-top: 10px; */
+    width: fit-content;
+    height: 320px;
+}
+.flip-board {
+    transform: rotate(180deg);
+}
+.flip {
+    transform: rotate(180deg);
 }
 
 p {

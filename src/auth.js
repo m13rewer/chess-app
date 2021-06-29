@@ -1,15 +1,11 @@
-import * as AWS from 'aws-sdk';
 import {
     BrowserRouter as Router,
-    Switch,
     Route,
-    Link, 
     Redirect,
     useHistory
   } from "react-router-dom";
 import {Home} from './App.js';
 import React from 'react';
-const https = require('https');
 const axios = require('axios');
 
 
@@ -61,7 +57,6 @@ function Login () {
         }
         
         console.log(dataObj);
-        //console.log(JSON.parse(data));
         console.log(`statusCode: ${res.status}`);
         console.log(res);
       })

@@ -1,4 +1,3 @@
-// import logo from './logo.svg';
 import './App.css';
 import React from 'react';
 import {PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece} from './pieces';
@@ -7,8 +6,6 @@ import {
   Switch,
   Route,
   Link,
-  useHistory,
-  Redirect
 } from "react-router-dom";
 
 import {
@@ -17,10 +14,6 @@ import {
   Register,
   Login
 } from './auth.js';
-// import { GameLiftClient, AcceptMatchCommand } from "@aws-sdk/client-gamelift";
-// import { LambdaClient, AddLayerVersionPermissionCommand } from "@aws-sdk/client-lambda";
-// import * as AWS from 'aws-sdk';
-// import { subscribeToGameLiftServer } from './api';
 import io from 'socket.io-client';
 
 class Square extends React.Component {
@@ -206,15 +199,36 @@ class Game extends React.Component {
   }
 
   startGame() {
-    //we make some kind of api call
-    //this.fakeApiCall();
-    this.connectToGameServer();
-
-    
+    this.connectToGameServer((color) => {
+      this.flipBoard(color);
+    });
     
   }
 
-  connectToGameServer() {
+  flipBoard(color) {
+    console.log("flipBoard()");
+    console.log(color);
+    if(color !== 'black') {
+      return;
+    }
+    const board = document.getElementById('board');
+    board.classList.add('flip');
+    const children = Array.prototype.slice.call(board.children);
+    console.log(board);
+    console.log(children);
+    let squares;
+
+    for(let i = 0; i < children.length; i++) {
+      squares = Array.prototype.slice.call(children[i].children);
+      console.log(squares);
+      for(let e = 0; e < squares.length; e++) {
+        squares[e].classList.add('flip');
+      }
+    }
+    
+  }
+
+  connectToGameServer(f) {
     console.log('connectToGameServer');
     if(this.state.player.status === 'playing') return;
     
@@ -287,12 +301,14 @@ class Game extends React.Component {
           whiteToMove: true,
         }
       );
+      f(playerObj.color);
     });
 
     socket.on('end game', function() {
       console.log("end game");
       context.endGame();
     });
+    
   }
 
   sendMoves(coordinate, piece) {

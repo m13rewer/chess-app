@@ -5,7 +5,7 @@ const server = http.createServer(app);
 const io = require("socket.io") (server, {
     
     cors: {
-        origin: "http://localhost:3006",
+        origin: "https://main.dwta905zctald.amplifyapp.com",
         methods: ["GET", "POST"],
     }
         

@@ -12,36 +12,8 @@ const io = require("socket.io") (server, {
 });
 
 const openGames = [];
-const closedGames = [];
+
 let connectedUsers = [];
-// let i = 0;
-
-// app.get('/game', (req, res) => {
-//     console.log(req);
-//     if(openGames.length > 0) {
-//         openGames[0].player2 = "";
-//         openGames[0].black = "";
-//         return;
-        
-//     }
-
-//     openGames[0] = 
-//         {
-//             player1: "",
-//             player2: null,
-//             white: "",
-//             black: null
-
-//         }
-    
-//     res.send(
-//         {
-//             gameIndex: i,
-//             player1: "",
-//             player2: ""
-
-//         });
-// });
 
 function matchMaking(auth, socketID) {
     if(openGames.length === 0 || (openGames.length > 0 && openGames[0].player2)) {
@@ -74,10 +46,6 @@ function matchMaking(auth, socketID) {
             
         return matchObj;
     }
-}
-
-function startGame(socketID1, socketID2) {
-    //socket.
 }
 
 io.use((socket, next) => {
@@ -120,7 +88,7 @@ io.on('connection', async (socket) => {
         const match = matchMaking(auth, socketID);
         const player2 = match.player2;
         socket.matchObj = match;
-        //const player1 = match.player1;
+        
         connectedUsers.unshift(auth.username);
         console.log(connectedUsers);
         console.log(match);

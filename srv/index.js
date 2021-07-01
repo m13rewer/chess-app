@@ -1,10 +1,6 @@
 const http = require('http');
-const fs = require('fs');
-const options = {
-    key: fs.readFileSync('key.pem'),
-    cert: fs.readFileSync('cert.pem')
-  };
-const server = http.createServer(options);
+
+const server = http.createServer();
 const io = require("socket.io") (server, {
     
     cors: {

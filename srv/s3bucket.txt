@@ -1,0 +1,1 @@
+S3 URL: https://s3-us-west-1.amazonaws.com/cf-templates-1a3u5bg811g4o-us-west-1/2021182sEX-public-service.yml

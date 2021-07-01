@@ -232,7 +232,7 @@ class Game extends React.Component {
     console.log('connectToGameServer');
     if(this.state.player.status === 'playing') return;
     
-    const socket = io('13.57.38.27:80', { autoConnect: false });
+    const socket = io('13.57.38.27:443', { autoConnect: false });
     const username = "m13rewer" + Math.floor((Math.random()*500));
     
     socket.auth = { username: username };

@@ -17,7 +17,7 @@ Parameters:
                  will handle the traffic for this service
   ContainerPort:
     Type: Number
-    Default: 80
+    Default: 3000
     Description: What port number the application inside the docker container is binding to
   ContainerCpu:
     Type: Number
@@ -124,13 +124,13 @@ Resources:
     Properties:
       HealthCheckIntervalSeconds: 6
       HealthCheckPath: /
-      HealthCheckProtocol: HTTP
+      HealthCheckProtocol: HTTPS
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       TargetType: ip
       Name: !Ref 'ServiceName'
-      Port: 80
-      Protocol: HTTP
+      Port: 443
+      Protocol: HTTPS
       UnhealthyThresholdCount: 2
       VpcId:
         Fn::ImportValue:

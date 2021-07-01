@@ -4,7 +4,7 @@ const server = http.createServer();
 const io = require("socket.io") (server, {
     
     cors: {
-        origin: "https://main.dwta905zctald.amplifyapp.com",
+        origin: "*",
         methods: ["GET", "POST"],
     }
         

@@ -1,0 +1,26 @@
+version: 0.2
+
+env:
+    variables:
+        CACHE_CONTROL: "86400"
+        S3_BUCKET: "m13rewer.com"
+        BUILD_FOLDER: "build"
+phases:
+  install:
+    runtime-versions:
+        nodejs: 14
+    commands:
+        - echo Installing source NPM dependencies...
+        - npm install
+  build:
+    commands:
+        - echo Build started
+        - npm run build
+  post_build:
+    commands:
+        - aws s3 sync build/ s3://${S3_BUCKET} --delete
+artifacts:
+    files:
+        - '**/**'
+    base-directory: 'build*'
+    discard-paths: yes

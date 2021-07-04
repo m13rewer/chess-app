@@ -168,7 +168,7 @@ const initialState =
         ])
       }
     ],
-    player: {color: '', isMyTurn: false, status: ''},
+    player: {color: '', isMyTurn: false, status: '', opponent: ''},
     selectedPiece: null,
     //moves: [],
     //pieces: [],
@@ -276,8 +276,9 @@ class Game extends React.Component {
       const content = msg.content;
       const piece = content.piece;
       const coordinate = content.coordinate;
-
+      
       context.movePiece(coordinate, piece);
+      context.switchTurns();
     });
 
     socket.on('chat message', function(msg) {
@@ -298,9 +299,10 @@ class Game extends React.Component {
             opponent: !(content.player1.username === username) ? content.player1: content.player2
           },
           selectedPiece: null,
-          whiteToMove: true,
+          whiteToMove: playerObj.color === 'white' ? true: false,
         }
       );
+      console.log(!(content.player1.username === username) ? content.player1: content.player2);
       flipBoard(playerObj.color);
     });
 
@@ -318,6 +320,7 @@ class Game extends React.Component {
     const socket = this.state.socket;
     const room = this.state.matchObject.room;
     const opponent = this.state.player.opponent;
+    console.log(this.state.player);
     console.log(opponent);
 
     socket.emit("private message", {
@@ -433,7 +436,7 @@ class Game extends React.Component {
       });
     }
 
-    if(legalMoves.includes(coordinate)) {
+    if(legalMoves.includes(coordinate) && player.isMyTurn) {
       console.log("coordinateMatches");
       if(!this.movePiece(coordinate, selectedPiece)) {
         return; 
@@ -450,9 +453,10 @@ class Game extends React.Component {
 
   switchTurns() {
     const whiteToMove = this.state.whiteToMove;
+    const player = this.state.player;
     this.setState({
-      whiteToMove: !whiteToMove
-       //this is temporary because we will never change player color during a real game
+      whiteToMove: !whiteToMove,
+      player: {color: player.color, status: player.status, isMyTurn: !player.isMyTurn, opponent: player.opponent}
     });
   }
 
@@ -1067,6 +1071,7 @@ class Game extends React.Component {
 
   movePiece(coordinate, piece) {
     console.log("movePiece()");
+    //if() return false;
     const history = this.state.history.slice(0, 1);
     const current = history[history.length - 1];
     const boardMap = current.board;

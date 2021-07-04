@@ -4,7 +4,7 @@ const server = http.createServer();
 const io = require("socket.io") (server, {
     
     cors: {
-        origin: "http://m13rewer.com.s3-website-us-east-1.amazonaws.com",
+        origin: "http://localhost:3006",
         methods: ["GET", "POST"],
     }
         

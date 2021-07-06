@@ -1197,8 +1197,8 @@ class Game extends React.Component {
         <Board onClick={(coordinate, piece) => this.handleClick(coordinate, piece)} 
         board={current.board} 
         onPromote={(coordinate, piece) => this.handlePromotion(coordinate, piece)}/>
-        <button onClick={() => this.startGame()}>Create Game</button>
-        <button onClick={() => this.sendMessage()}>Message</button>
+        <button id="create-game" onClick={() => this.startGame()}>Create Game</button>
+        {/* <button onClick={() => this.sendMessage()}>Message</button> */}
       </div>
     );
   }
@@ -1250,7 +1250,6 @@ function Home() {
 
   return (
     <div>
-      <h2>Home</h2>
       <Game user={User}/>
     </div>
   );

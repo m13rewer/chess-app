@@ -6,40 +6,68 @@
     float: left;
 }
 
+#create-game {
+    margin-top: 40px;
+    display: block;
+    height: 70px;
+    width: 300px;
+    border-radius: 7px;
+    border-style: none;
+    background-color: #332c29;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#create-game:hover {
+    background-color: grey;
+    color: #332c29;
+}
+
 #board {
     
     /* display: block; */
     /* margin-top: 10px; */
+    margin-right: auto;
+    margin-left: auto;
     width: fit-content;
-    height: 500px;
+    height: 480px;
 }
 #root > div > div {
     height: inherit;
 }
 #root > div > div > div {
     height: 640px;
+    margin-top: 50px;
 }
 #root > div > div > div > div {
     height: 600px;
 }
 nav {
-    height: 50px;
+    padding-left: 30px;
+    background-color: #211c1c;
 }
 
 nav > ul {
     height: inherit;
     padding-left: 0;
-    padding-top: 10px;
+    margin-bottom: 0;
 }
 
 a {
     text-decoration: none;
+    color: white;
+    font-weight: normal;
+    letter-spacing: 1px;
 }
 
 #root > div > div > nav > ul > li {
     float: left;
     list-style-type: none;
     margin-right: 15px;
+    line-height: 3;
 }
 
 .flip {

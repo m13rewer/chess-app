@@ -13,7 +13,7 @@
     width: 300px;
     border-radius: 7px;
     border-style: none;
-    background-color: #332c29;
+    background-color: #211c1c;
     color: white;
     font-size: 25px;
     font-weight: bold;
@@ -46,6 +46,7 @@
     height: 600px;
 }
 nav {
+    height: 50px;
     padding-left: 30px;
     background-color: #211c1c;
 }

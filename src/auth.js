@@ -70,8 +70,8 @@ function Login () {
     
   return (
     <div>
-      <h2>Login</h2>
-      <form>
+      <h2 id="login">Login</h2>
+      <form id="login-form">
         <input type="text" placeholder="Username" name="username" onChange={(event) => handleChange(event)}/>
         <input type="password" placeholder="Password" name="password" onChange={(event) => handleChange(event)}/>
         <input type="button" onClick={() => handleSubmit()} value="Login"/>

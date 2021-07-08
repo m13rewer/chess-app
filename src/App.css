@@ -28,7 +28,7 @@
     box-sizing: border-box;
 }
 
-#login-form > input:focus {
+#login-form > input[type=text]:focus {
     border: none;
 }
 
@@ -65,7 +65,7 @@
     box-sizing: border-box;
 }
 
-#register-form > input:focus {
+#register-form > input[type=text]:focus {
     border: none;
 }
 

@@ -156,8 +156,8 @@ function Register() {
   
   return (
     <div>
-      <h2>Register</h2>
-      <form>
+      <h2 id="register">Register</h2>
+      <form id="register-form">
         <input type="text" placeholder="First Name" name="firstname" onChange={(event) => handleChange(event)}/>
         <input type="text" placeholder="Last Name" name="lastname" onChange={(event) => handleChange(event)}/>
         <input type="text" placeholder="Username" name="username" onChange={(event) => handleChange(event)}/>

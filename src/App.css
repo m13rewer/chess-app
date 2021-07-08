@@ -25,6 +25,7 @@
     border-style: none;
     margin-bottom: 10px;
     padding-left: 10px;
+    box-sizing: border-box;
 }
 
 #login-form > input:focus {
@@ -36,6 +37,44 @@
     background-color: grey;
     color: #332c29;
 }
+
+#register {
+    color: white;
+    text-align: center;
+    letter-spacing: 1px;
+}
+#register-form {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    width: 300px;
+    height: 300px;
+}
+
+#register-form > input {
+    float: left;
+    clear: left;
+    background-color: #211c1c;
+    color: white;
+    font-size: 20px;
+    width: inherit;
+    border-radius: 5px;
+    border-style: none;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    box-sizing: border-box;
+}
+
+#register-form > input:focus {
+    border: none;
+}
+
+#register-form > input[type=button]:nth-child(6):hover {
+    cursor: pointer;
+    background-color: grey;
+    color: #332c29;
+}
+
 .square {
     /* display: inline-block; */
     /* border: solid black 1px; */

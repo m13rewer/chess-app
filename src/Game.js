@@ -1,4 +1,7 @@
 import io from 'socket.io-client';
+import React from 'react';
+import { PiecePicker, Pawn, Knight, Bishop, Rook, Queen, King, NoPiece } from './pieces';
+import { Square, Board } from './App';
 
 class Game extends React.Component {
     constructor(props) {

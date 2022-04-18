@@ -233,5 +233,5 @@ function Home() {
 }
 
 
-
+export {Square, Board};
 export default App;

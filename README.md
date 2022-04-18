@@ -12,3 +12,5 @@ front-end is hosted on AWS S3. AWS CodePipeline deploys to the bucket when it’
 push to my GitHub repository main branch. I am the sole contributor to this project and intend to
 continue adding new features and fix bugs.
 
+The front end is hosted at this link: http://m13rewer.com.s3-website-us-east-1.amazonaws.com/login
+

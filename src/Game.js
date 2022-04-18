@@ -980,4 +980,6 @@ class Game extends React.Component {
       );
     }
   }
+
+  export {Game};
   
